@@ -97,18 +97,31 @@ using (user_id = auth.uid());
 -- Profiles
 alter table public.profiles enable row level security;
 
-create policy "Profiles are viewable by everyone"
+create policy "Authenticated users can read profiles"
 on public.profiles
 for select
+to authenticated
 using (true);
 
 create policy "Users can create their own profile"
 on public.profiles
 for insert
-with check (id = auth.uid());
+to authenticated
+with check (select auth.uid() = id
+and role = 'user'
+and is_blocked = false);
 
 create policy "Users can update their own profile"
 on public.profiles
 for update
 using (id = auth.uid())
 with check (id = auth.uid());
+
+revoke update on public.profiles from authenticated;
+
+grant update(
+    first_name,
+    last_name
+)
+on public.profiles
+to authenticated;
