@@ -1,7 +1,9 @@
+import { useAuth } from '../hooks/useAuth';
 import { logoutUser } from '../services/auth';
 import { useNavigate } from 'react-router-dom';
 
 function TempHomePage() {
+    const { user, loading } = useAuth()
     const navigation = useNavigate()
     const handleLogout = async () => {
         try {
@@ -12,14 +14,25 @@ function TempHomePage() {
         }
     };
 
+    if (loading) {
+        return <p>Loading...</p>;
+    }
+
     return (
         <div>
             <h1>Crypto Forum</h1>
-            <p>You are logged in.</p>
 
-            <button onClick={handleLogout}>
-                Logout
-            </button>
+            {user ? (
+                <>
+                    <p>Logged in as:  {user.email}</p>
+
+                    <button onClick={handleLogout}>
+                        Logout
+                    </button>
+                </>
+            ) : (
+                <p>You are logged out</p>
+            )}
         </div>
     );
 }
