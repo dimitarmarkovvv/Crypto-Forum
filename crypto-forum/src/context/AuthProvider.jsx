@@ -5,16 +5,30 @@ import { supabase } from '../supabase/supabaseClient';
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState(null);
 
   useEffect(() => {
     const loadSession = async () => {
       const { data, error } = await supabase.auth.getSession();
+      const authUser = data.session?.user ?? null;
+      setUser(authUser);
 
       if (error) {
         console.error('Failed to get session:', error.message);
       }
 
-      setUser(data.session?.user ?? null);
+      if(authUser){
+        const {data : profileData} = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', authUser.id)
+        .single();
+
+        setProfile(profileData);
+      } else {
+        setProfile(null);
+      }
+
       setLoading(false);
     };
 
@@ -22,10 +36,24 @@ export function AuthProvider({ children }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    } = supabase.auth.onAuthStateChange( async (_event, session) => {
+        const authUser = session?.user ?? null;
+        setUser(authUser);
+
+        if (authUser) {
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', authUser.id)
+            .single();
+
+          setProfile(profileData);
+        } else {
+          setProfile(null);
+        }
+
+        setLoading(false);
+      });
 
     return () => {
       subscription.unsubscribe();
@@ -33,7 +61,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <AuthContext.Provider value={{ user,profile, loading }}>
       {children}
     </AuthContext.Provider>
   );
