@@ -1,9 +1,19 @@
-// TODO: replace with real supabase query (issue #9)
+import { supabase } from "../supabase/supabaseClient";
+
+
 export const getForumStats = async () => {
+    const { data, error} = await supabase.rpc('get_forum_stats');
+
+    if(error) {
+        throw error;
+    }
+
+    const stats = data?.[0];
+
     return {
-        totalUsers: 128,
-        totalPosts: 342,
-        totalComments: 891
+        totalUsers: Number(stats?.total_users ?? 0),
+        totalPosts: Number(stats?.total_posts ?? 0),
+        totalComments: Number(stats?.total_comments ?? 0)
     };
 };
 
