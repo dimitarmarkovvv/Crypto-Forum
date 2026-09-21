@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getForumStats, getRecentPosts } from '../services/homepage';
 
-function TempHomePage() {
+function HomePage() {
     const { user, loading } = useAuth();
     const [stats, setStats] = useState(null);
     const [posts, setPosts] = useState([]);
@@ -73,4 +73,4 @@ return (
 );
 };
 
-export default TempHomePage;
+export default HomePage;
