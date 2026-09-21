@@ -3,6 +3,7 @@ import { logoutUser } from '../services/auth';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getForumStats, getMostCommentedPosts, getRecentPosts } from '../services/homepage';
+import { formatDate } from '../utils/formatDate.js'
 
 function HomePage() {
     const { user, loading } = useAuth();
@@ -68,7 +69,7 @@ return (
             {posts.map((post) => (
                 <div key={post.id}>
                     <h3>{post.title}</h3>
-                    <p>by {post.author} — {post.created_at}</p>
+                    <p>by {post.author} — {formatDate(post.created_at)}</p>
                 </div>
             ))}
         </section>
@@ -78,7 +79,7 @@ return (
             {comments.map((comment) => (
                 <div key={comment.id}>
                     <h3>{comment.title}</h3>
-                    <p>by {comment.author} — {comment.created_at}</p>
+                    <p>by {comment.author} — {formatDate(comment.created_at)}</p>
                 </div>
             ))}
         </section>
