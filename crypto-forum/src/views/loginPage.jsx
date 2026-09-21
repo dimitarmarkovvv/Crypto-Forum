@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { loginUser } from '../services/auth';
 
 export function LoginPage() {
@@ -9,6 +9,9 @@ export function LoginPage() {
     const [error, setError] = useState(false)
 
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const from = location.state?.from?.pathname || '/';
 
     const handleSubmit = async (event) => {
         event.preventDefault()
@@ -19,7 +22,7 @@ export function LoginPage() {
         try {
             await loginUser(email, password)
 
-            navigate('/')
+            navigate(from, { replace: true })
         } catch (error) {
             setError(error.message)
         } finally {
@@ -31,15 +34,15 @@ export function LoginPage() {
         <div>
             <h1>Login</h1>
 
-            <form onSubmit= {handleSubmit}>
+            <form onSubmit={handleSubmit}>
                 <div>
                     <label htmlFor="email">Email</label>
-                    <input 
-                    id='email'
-                    type='email'
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
-                    required
+                    <input
+                        id='email'
+                        type='email'
+                        value={email}
+                        onChange={(event) => setEmail(event.target.value)}
+                        required
                     />
                 </div>
 
@@ -47,11 +50,11 @@ export function LoginPage() {
                     <label htmlFor="password">Password</label>
 
                     <input
-                    id='password'
-                    type='password'
-                    value={password}
-                    onChange={(event) => setPassword(event.target.value)}
-                    required
+                        id='password'
+                        type='password'
+                        value={password}
+                        onChange={(event) => setPassword(event.target.value)}
+                        required
                     />
                 </div>
 
