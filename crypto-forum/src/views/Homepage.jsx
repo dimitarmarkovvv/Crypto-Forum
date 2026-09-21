@@ -2,12 +2,13 @@ import { useAuth } from '../hooks/useAuth';
 import { logoutUser } from '../services/auth';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { getForumStats, getRecentPosts } from '../services/homepage';
+import { getForumStats, getMostCommentedPosts, getRecentPosts } from '../services/homepage';
 
 function HomePage() {
     const { user, loading } = useAuth();
     const [stats, setStats] = useState(null);
     const [posts, setPosts] = useState([]);
+    const [comments, setComments] = useState([]);
     const navigation = useNavigate();
 
     const handleLogout = async () => {
@@ -23,9 +24,11 @@ function HomePage() {
     const loadHomePageData = async () => {
         const statsData = await getForumStats();
         const postData = await getRecentPosts();
+        const commentData = await getMostCommentedPosts();
 
         setPosts(postData);
         setStats(statsData);
+        setComments(commentData);
     };
 
         loadHomePageData();
@@ -66,6 +69,16 @@ return (
                 <div key={post.id}>
                     <h3>{post.title}</h3>
                     <p>by {post.author} — {post.created_at}</p>
+                </div>
+            ))}
+        </section>
+
+        <section>
+            <h2>Most commented posts</h2>
+            {comments.map((comment) => (
+                <div key={comment.id}>
+                    <h3>{comment.title}</h3>
+                    <p>by {comment.author} — {comment.created_at}</p>
                 </div>
             ))}
         </section>
