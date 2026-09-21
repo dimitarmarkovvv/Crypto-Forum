@@ -1,6 +1,5 @@
 import { supabase } from "../supabase/supabaseClient";
 
-
 export const getForumStats = async () => {
     const { data, error } = await supabase.rpc('get_forum_stats');
 
@@ -17,7 +16,6 @@ export const getForumStats = async () => {
     };
 };
 
-// TODO: replace with real supabase query (issue #9)
 export const getRecentPosts = async () => {
     const { data, error } = await supabase.rpc('get_recent_posts');
 
@@ -27,3 +25,13 @@ export const getRecentPosts = async () => {
 
     return data ?? []
 };
+
+export const getMostCommentedPosts = async () => {
+    const {data, error} =  await supabase.rpc('get_most_commented_posts');
+
+    if(error) {
+        throw error;
+    }
+
+    return data ?? [];
+}
