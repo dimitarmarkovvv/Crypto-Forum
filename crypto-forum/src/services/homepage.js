@@ -27,9 +27,9 @@ export const getRecentPosts = async () => {
 };
 
 export const getMostCommentedPosts = async () => {
-    const {data, error} =  await supabase.rpc('get_most_commented_posts');
+    const { data, error } = await supabase.rpc('get_most_commented_posts');
 
-    if(error) {
+    if (error) {
         throw error;
     }
 
