@@ -6,11 +6,13 @@ function PostsPage() {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 10;
 
     useEffect(() => {
         const loadPosts = async () => {
             try{
-                const postsData = await getPosts();
+                const postsData = await getPosts(currentPage,pageSize);
                 setPosts(postsData);
             } catch(error){
                 setError(error.message);
@@ -45,7 +47,7 @@ function PostsPage() {
                         <p>{post.content}</p>
 
                         <p>
-                            by {post.author} - {formatDate(post.created_at)}
+                            by {post.profiles.username} - {formatDate(post.created_at)}
                         </p>
                     </article>
                 ))
