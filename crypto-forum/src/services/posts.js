@@ -1,16 +1,36 @@
 import { supabase } from "../supabase/supabaseClient";
 
-export const getPosts = async (page = 1, pageSize = 10) => {
+export const getPosts = async ({
+  page = 1,
+  pageSize = 10,
+  search = '',
+  sort = 'newest',
+  authorID = null,
+} = {}) => {
   const from = (page - 1) * pageSize;
-  const to = from + pageSize -1;
+  const to = from + pageSize - 1;
 
-  const {data, error} = await supabase
-  .from('posts')
-  .select('*, profiles(username)')
-  .order('created_at', { ascending: false })
-  .range(from, to);
+  let query = supabase
+    .from('posts')
+    .select('*, profiles(username)')
 
-  if(error){
+  if (search.trim()) {
+    query = query.ilike('title', `%${search.trim()}%`)
+  }
+
+  if (authorID) {
+    query = query.eq('author_id', authorID)
+  }
+
+  query = query
+    .order('created_at', {
+      ascending: sort === 'oldest',
+    })
+    .range(from, to)
+
+  const { data, error } = await query
+
+  if (error) {
     throw error;
   };
 
