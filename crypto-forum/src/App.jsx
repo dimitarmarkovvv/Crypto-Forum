@@ -4,6 +4,7 @@ import HomePage from './views/Homepage.jsx';
 import { RegisterPage } from './views/RegisterPage';
 import { ProtectedRoute } from './routes/ProtectedRoute.jsx'
 import PostsPage from './views/PostsPage.jsx';
+import CreatPostPage from './views/CreatePostPage.jsx';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
 
         <Route element={<ProtectedRoute />}>
           <Route path='/posts' element={<PostsPage />} />
+          <Route path='/posts/create' element={<CreatPostPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
