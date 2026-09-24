@@ -5,7 +5,7 @@ import { createPost } from '../services/posts';
 import { Button, Container, Field, Heading, Input, Stack, Textarea } from '@chakra-ui/react';
 import { toaster } from '../components/ui/toast-store.js';
 
-function CreatPostPage() {
+function CreatePostPage() {
     const { user } = useAuth();
 
     const [title, setTitle] = useState('');
@@ -90,4 +90,4 @@ function CreatPostPage() {
     )
 }
 
-export default CreatPostPage;
+export default CreatePostPage;

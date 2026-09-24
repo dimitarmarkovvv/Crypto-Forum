@@ -4,7 +4,7 @@ import HomePage from './views/Homepage.jsx';
 import { RegisterPage } from './views/RegisterPage';
 import { ProtectedRoute } from './routes/ProtectedRoute.jsx'
 import PostsPage from './views/PostsPage.jsx';
-import CreatPostPage from './views/CreatePostPage.jsx';
+import CreatePostPage from './views/CreatePostPage.jsx';
 import EditPostPage from './views/EditPostPage.jsx';
 
 function App() {
@@ -17,7 +17,7 @@ function App() {
 
         <Route element={<ProtectedRoute />}>
           <Route path='/posts' element={<PostsPage />} />
-          <Route path='/posts/create' element={<CreatPostPage />} />
+          <Route path='/posts/create' element={<CreatePostPage />} />
           <Route path='/posts/:id/edit' element={<EditPostPage />} />
         </Route>
       </Routes>
