@@ -2,32 +2,31 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useState } from 'react';
 import { createPost } from '../services/posts';
+import { Button, Container, Field, Heading, Input, Stack, Textarea } from '@chakra-ui/react';
+import { toaster } from '../components/ui/toast-store.js';
 
 function CreatPostPage() {
     const { user } = useAuth();
 
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
-    const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-
-        setError('');
 
         const trimmedTitle = title.trim();
         const trimmedContent = content.trim();
 
         if (trimmedTitle.length < 16 || trimmedTitle.length > 64) {
-            setError('Title must be between 16 and 64 characters.');
+            toaster.create({ title: 'Title must be between 16 and 64 characters.', type: 'error' });
             return;
         }
 
         if (trimmedContent.length < 32 || trimmedContent.length > 8192) {
-            setError('Content must be between 32 and 8192 characters.');
+            toaster.create({ title: 'Content must be between 32 and 8192 characters.', type: 'error' });
             return;
         }
 
@@ -44,51 +43,50 @@ function CreatPostPage() {
 
             navigate('/posts');
         } catch (error) {
-            setError(error.message)
+            toaster.create({ title: error.message, type: 'error' })
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div>
-            <h1>Create Post</h1>
+        <Container maxW="2xl" py={10}>
+            <Heading mb={6}>Create Post</Heading>
 
             <form onSubmit={handleSubmit}>
-                <div>
-                    <label htmlFor="title">Title</label>
+                <Stack gap={4}>
+                    <Field.Root required>
+                        <Field.Label>Title</Field.Label>
+                        <Input
+                            type="text"
+                            id="title"
+                            value={title}
+                            onChange={(event) => setTitle(event.target.value)}
+                            minLength={16}
+                            maxLength={64}
+                            required
+                        />
+                    </Field.Root>
 
-                    <input
-                        type="text"
-                        id="title"
-                        value={title}
-                        onChange={(event) => setTitle(event.target.value)}
-                        minLength={16}
-                        maxLength={64}
-                        required
-                    />
-                </div>
+                    <Field.Root required>
+                        <Field.Label>Content</Field.Label>
 
-                <div>
-                    <label htmlFor="content">Content</label>
+                        <Textarea
+                            id="content"
+                            value={content}
+                            onChange={(event) => setContent(event.target.value)}
+                            minLength={32}
+                            maxLength={8192}
+                            required
+                        />
+                    </Field.Root>
 
-                    <textarea
-                        id="content"
-                        value={content}
-                        onChange={(event) => setContent(event.target.value)}
-                        minLength={32}
-                        maxLength={8192}
-                        required
-                    />
-                </div>
-
-                {error && <p>{error}</p>}
-
-                <button type="submit" disabled={loading}>
-                    {loading ? 'Creating...' : 'Create Post'}
-                </button>
+                    <Button type="submit" loading={loading} loadingText="Creating...">
+                        Create Post
+                    </Button>
+                </Stack>
             </form>
-        </div>
+        </Container>
     )
 }
 

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getForumStats, getMostCommentedPosts, getRecentPosts } from '../services/homepage';
 import { formatDate } from '../utils/formatDate.js'
+import { Box, Button, Center, Container, Heading, Spinner, Stack, Text } from '@chakra-ui/react';
 
 function HomePage() {
     const { user, loading } = useAuth();
@@ -36,54 +37,62 @@ function HomePage() {
     },[]);
 
     if (loading) {
-        return <p>Loading...</p>;
+        return (
+            <Center py={20}>
+                <Spinner size='lg' />
+            </Center>
+        );
     };
 
 return (
-    <div>
-        <h1>Crypto Forum</h1>
+    <Container maxW="3xl" py={10}>
+        <Heading>Crypto Forum</Heading>
 
         {user ? (
-            <>
-                <p>Logged in as:  {user.email}</p>
-                <button onClick={handleLogout}>Logout</button>
-            </>
+            <Stack direction="row" align="center" gap={4} mt={4}>
+                <Text>Logged in as: {user.email}</Text>
+                <Button size="sm" onClick={handleLogout}>Logout</Button>
+            </Stack>
         ) : (
-            <p>You are logged out</p>
+            <Text mt={4}>You are logged out</Text>
         )}
 
-        <section>
-            <p>Crypto Forum is a community for discussing cryptocurrency news, trading strategies, and blockchain technology.</p>
-        </section>
+        <Box as="section" mt={8}>
+            <Text>Crypto Forum is a community for discussing cryptocurrency news, trading strategies, and blockchain technology.</Text>
+        </Box>
 
         {stats && (
-            <section>
-                <p>Users: {stats.totalUsers}</p>
-                <p>Posts: {stats.totalPosts}</p>
-                <p>Comments: {stats.totalComments}</p>
-            </section>
+            <Box as="section" mt={8}>
+                <Text>Users: {stats.totalUsers}</Text>
+                <Text>Posts: {stats.totalPosts}</Text>
+                <Text>Comments: {stats.totalComments}</Text>
+            </Box>
         )}
 
-        <section>
-            <h2>Recent Posts</h2>
-            {posts.map((post) => (
-                <div key={post.id}>
-                    <h3>{post.title}</h3>
-                    <p>by {post.author} — {formatDate(post.created_at)}</p>
-                </div>
-            ))}
-        </section>
+        <Box as="section" mt={8}>
+            <Heading size="lg" mb={4}>Recent Posts</Heading>
+            <Stack gap={4}>
+                {posts.map((post) => (
+                    <Box key={post.id}>
+                        <Heading size="md">{post.title}</Heading>
+                        <Text color="fg.muted">by {post.author} — {formatDate(post.created_at)}</Text>
+                    </Box>
+                ))}
+            </Stack>
+        </Box>
 
-        <section>
-            <h2>Most commented posts</h2>
-            {comments.map((comment) => (
-                <div key={comment.id}>
-                    <h3>{comment.title}</h3>
-                    <p>by {comment.author} — {formatDate(comment.created_at)}</p>
-                </div>
-            ))}
-        </section>
-    </div>
+        <Box as="section" mt={8}>
+            <Heading size="lg" mb={4}>Most commented posts</Heading>
+            <Stack gap={4}>
+                {comments.map((comment) => (
+                    <Box key={comment.id}>
+                        <Heading size="md">{comment.title}</Heading>
+                        <Text color="fg.muted">by {comment.author} — {formatDate(comment.created_at)}</Text>
+                    </Box>
+                ))}
+            </Stack>
+        </Box>
+    </Container>
 );
 };
 
