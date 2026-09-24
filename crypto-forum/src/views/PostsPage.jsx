@@ -3,12 +3,25 @@ import { deletePost, getPosts } from "../services/posts";
 import { formatDate } from "../utils/formatDate";
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from "react-router-dom";
+import {
+    Box,
+    Button,
+    Center,
+    Container,
+    Heading,
+    HStack,
+    Input,
+    NativeSelect,
+    Spinner,
+    Stack,
+    Text,
+} from "@chakra-ui/react";
+import { toaster } from '../components/ui/toast-store.js';
 
 function PostsPage() {
     const { user } = useAuth();
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
     const navigate = useNavigate();
 
     const [currentPage, setCurrentPage] = useState(1);
@@ -19,26 +32,33 @@ function PostsPage() {
 
     const pageSize = 10;
 
-    const handleDelete = async (postId) => {
-        const confirmed = window.confirm('Are you sure you want to delete this post?');
+    const handleDelete = (postId) => {
+        const toastId = toaster.create({
+            title: 'Delete this post?',
+            description: 'This action cannot be undone.',
+            type: 'warning',
+            duration: Infinity,
+            closable: true,
+            action: {
+                label: 'Delete',
+                onClick: async () => {
+                    toaster.dismiss(toastId);
 
-        if (!confirmed) {
-            return;
-        }
+                    try {
+                        await deletePost(postId);
 
-        try {
-            await deletePost(postId);
-
-            setPosts((prevPosts) => prevPosts.filter((p) => p.id !== postId));
-        } catch (error) {
-            setError(error.message);
-        };
+                        setPosts((prevPosts) => prevPosts.filter((p) => p.id !== postId));
+                    } catch (error) {
+                        toaster.create({ title: error.message, type: 'error' });
+                    };
+                },
+            },
+        });
     };
 
     useEffect(() => {
         const loadPosts = async () => {
             setLoading(true)
-            setError('');
 
             try {
                 const postsData = await getPosts({
@@ -51,7 +71,7 @@ function PostsPage() {
 
                 setPosts(postsData);
             } catch (error) {
-                setError(error.message);
+                toaster.create({ title: error.message, type: 'error' });
             } finally {
                 setLoading(false);
             }
@@ -63,11 +83,11 @@ function PostsPage() {
 
 
     return (
-        <div>
-            <h1>Posts</h1>
+        <Container maxW="3xl" py={10}>
+            <Heading mb={6}>Posts</Heading>
 
-            <div>
-                <input
+            <HStack mb={6} gap={4} wrap="wrap">
+                <Input
                     type="text"
                     placeholder="Search posts..."
                     value={search}
@@ -75,62 +95,72 @@ function PostsPage() {
                         setSearch(event.target.value)
                         setCurrentPage(1)
                     }}
+                    maxW="sm"
                 />
 
-                <select
-                    value={sort}
-                    onChange={(event) => {
-                        setSort(event.target.value);
-                        setCurrentPage(1);
-                    }}
-                >
-                    <option value="newest">Newest</option>
-                    <option value="oldest">Oldest</option>
-                </select>
+                <NativeSelect.Root maxW="200px">
+                    <NativeSelect.Field
+                        value={sort}
+                        onChange={(event) => {
+                            setSort(event.target.value);
+                            setCurrentPage(1);
+                        }}
+                    >
+                        <option value="newest">Newest</option>
+                        <option value="oldest">Oldest</option>
+                    </NativeSelect.Field>
+                    <NativeSelect.Indicator />
+                </NativeSelect.Root>
 
-                <select
-                    value={filter}
-                    onChange={(event) => {
-                        setFilter(event.target.value);
-                        setCurrentPage(1);
-                    }}
-                >
-                    <option value="all">All Posts</option>
-                    <option value="mine">My posts</option>
-                </select>
-            </div>
-
+                <NativeSelect.Root maxW="200px">
+                    <NativeSelect.Field
+                        value={filter}
+                        onChange={(event) => {
+                            setFilter(event.target.value);
+                            setCurrentPage(1);
+                        }}
+                    >
+                        <option value="all">All Posts</option>
+                        <option value="mine">My posts</option>
+                    </NativeSelect.Field>
+                    <NativeSelect.Indicator />
+                </NativeSelect.Root>
+            </HStack>
 
             {loading ? (
-                <p>Loading posts...</p>
-            ) : error ? (
-                <p>{error}</p>
+                <Center py={10}>
+                    <Spinner size="lg" />
+                </Center>
             ) : posts.length === 0 ? (
-                <p>No posts available.</p>
+                <Text>No posts available.</Text>
             ) : (
-                posts.map((post) => (
-                    <article key={post.id}>
-                        <h2>{post.title}</h2>
+                <Stack gap={6}>
+                    {posts.map((post) => (
+                        <Box key={post.id} as="article" borderWidth="1px" borderRadius="md" p={4}>
+                            <Heading size="md">{post.title}</Heading>
 
-                        <p>{post.content}</p>
+                            <Text mt={2}>{post.content}</Text>
 
-                        <p>
-                            by {post.profiles.username} - {formatDate(post.created_at)}
-                        </p>
+                            <Text mt={2} color="fg.muted">
+                                by {post.profiles.username} - {formatDate(post.created_at)}
+                            </Text>
 
-                        {post.author_id === user.id && (
-                            <button onClick={() => navigate(`/posts/${post.id}/edit`)}>
-                                Edit
-                            </button>
-                        )}
+                            {post.author_id === user.id && (
+                                <HStack mt={4}>
+                                    <Button size="sm" onClick={() => navigate(`/posts/${post.id}/edit`)}>
+                                        Edit
+                                    </Button>
 
-                        {post.author_id === user.id &&
-                            <button onClick={() => handleDelete(post.id)}>Delete</button>
-                        }
-                    </article>
-                ))
+                                    <Button size="sm" colorPalette="red" onClick={() => handleDelete(post.id)}>
+                                        Delete
+                                    </Button>
+                                </HStack>
+                            )}
+                        </Box>
+                    ))}
+                </Stack>
             )}
-        </div>
+        </Container>
     )
 }
 

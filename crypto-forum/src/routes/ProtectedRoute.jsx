@@ -1,4 +1,5 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { Center, Spinner } from '@chakra-ui/react';
 import { useAuth } from '../hooks/useAuth';
 
 export const ProtectedRoute = () => {
@@ -7,9 +8,9 @@ export const ProtectedRoute = () => {
 
     if (loading) {
         return (
-            <p>
-                Loading...
-            </p>
+            <Center py={20}>
+                <Spinner size="lg" />
+            </Center>
         );
     };
 

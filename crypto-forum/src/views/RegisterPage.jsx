@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button, Container, Field, Heading, Input, Stack } from '@chakra-ui/react';
 import { registerUser } from '../services/auth';
+import { toaster } from '../components/ui/toast-store.js';
 
 export function RegisterPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [isLoading, setIsLoading] = useState('');
-    const [error, setError] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [username, setUsername] = useState('');
@@ -16,7 +17,6 @@ export function RegisterPage() {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        setError(' ');
         setIsLoading(true);
 
         try {
@@ -24,77 +24,78 @@ export function RegisterPage() {
 
             navigate('/');
         } catch (error) {
-            setError(error.message);
+            toaster.create({ title: error.message, type: 'error' });
         } finally {
             setIsLoading(false);
         };
     };
 
     return (
-        <div>
-            <h1>Register</h1>
+        <Container maxW="sm" py={10}>
+            <Heading mb={6}>Register</Heading>
 
-            <form onSubmit= {handleSubmit}>
+            <form onSubmit={handleSubmit}>
+                <Stack gap={4}>
+                    <Field.Root required>
+                        <Field.Label>Username</Field.Label>
+                        <Input
+                            id='username'
+                            type='text'
+                            value={username}
+                            onChange={(event) => setUsername(event.target.value)}
+                            required
+                        />
+                    </Field.Root>
 
-                <div>
-                    <label htmlFor="username">Username</label>
-                    <input 
-                    id='username'
-                    type='text'
-                    value={username}
-                    onChange={(event) => setUsername(event.target.value)}
-                    required
-                    />
-                </div>
+                    <Field.Root required>
+                        <Field.Label>First Name</Field.Label>
+                        <Input
+                            id='firstName'
+                            type='text'
+                            value={firstName}
+                            onChange={(event) => setFirstName(event.target.value)}
+                            required
+                        />
+                    </Field.Root>
 
-                <div>
-                    <label htmlFor="firstName">First Name</label>
-                    <input 
-                    id='firstName'
-                    type='text'
-                    value={firstName}
-                    onChange={(event) => setFirstName(event.target.value)}
-                    required
-                    />
-                </div>
+                    <Field.Root required>
+                        <Field.Label>Last Name</Field.Label>
+                        <Input
+                            id='lastName'
+                            type='text'
+                            value={lastName}
+                            onChange={(event) => setLastName(event.target.value)}
+                            required
+                        />
+                    </Field.Root>
 
-                <div>
-                    <label htmlFor="lastName">Last Name</label>
-                    <input 
-                    id='lastName'
-                    type='text'
-                    value={lastName}
-                    onChange={(event) => setLastName(event.target.value)}
-                    required
-                    />
-                </div>
+                    <Field.Root required>
+                        <Field.Label>Email</Field.Label>
+                        <Input
+                            id='email'
+                            type='email'
+                            value={email}
+                            onChange={(event) => setEmail(event.target.value)}
+                            required
+                        />
+                    </Field.Root>
 
-                <div>
-                    <label htmlFor="email">Email</label>
-                    <input 
-                    id='email'
-                    type='email'
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
-                    required
-                    />
-                </div>
+                    <Field.Root required>
+                        <Field.Label>Password</Field.Label>
+                        <Input
+                            id='password'
+                            type='password'
+                            value={password}
+                            onChange={(event) => setPassword(event.target.value)}
+                            required
+                        />
+                    </Field.Root>
 
-                <div>
-                    <label htmlFor="password">Password</label>
-
-                    <input
-                    id='password'
-                    type='password'
-                    value={password}
-                    onChange={(event) => setPassword(event.target.value)}
-                    required
-                    />
-                </div>
-
-                {error && <p>{error}</p>}
-                <button type='submit' disabled={isLoading}>{isLoading ? 'Registering....' : 'Register'}</button>
+                    <Button type='submit' loading={isLoading} loadingText='Registering....'>
+                        Register
+                    </Button>
+                </Stack>
             </form>
-        </div>
+        </Container>
     );
 };
