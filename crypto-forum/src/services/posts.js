@@ -15,7 +15,7 @@ export const getPosts = async ({
     .select('*, profiles(username)')
 
   if (search.trim()) {
-    query = query.ilike('title', `%${search.trim()}%`)
+    query = query.ilike('title', `${search.trim()}%`)
   }
 
   if (authorID) {
