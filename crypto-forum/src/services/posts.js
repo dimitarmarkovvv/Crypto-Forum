@@ -80,3 +80,17 @@ export const deletePost = async (postId) => {
 
   return data ?? null;
 };
+
+export const getPostById = async (id) => {
+  const {data, error} = await supabase
+  .from('posts')
+  .select('*, profiles(username)')
+  .eq('id', id)
+  .single();
+
+  if(error){
+    throw error;
+  };
+
+  return data;
+};
