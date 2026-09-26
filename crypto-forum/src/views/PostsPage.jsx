@@ -137,7 +137,7 @@ function PostsPage() {
                 <Stack gap={6}>
                     {posts.map((post) => (
                         <Box key={post.id} as="article" borderWidth="1px" borderRadius="md" p={4}>
-                            <Heading size="md">{post.title}</Heading>
+                            <Heading size="md" onClick={() => navigate(`/posts/${post.id}`)} cursor="pointer">{post.title}</Heading>
 
                             <Text mt={2}>{post.content}</Text>
 
