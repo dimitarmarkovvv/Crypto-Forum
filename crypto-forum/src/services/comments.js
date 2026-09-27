@@ -32,7 +32,7 @@ export const createComment = async (content, postId, authorId) => {
 
 export const updateComment = async (commentId, content) => {
     const cleanContent = normalizeCommentContent(content);
-    
+
     const { data, error } = await supabase
         .from('comments')
         .update({ cleanContent })
@@ -64,5 +64,11 @@ export const deleteComment = async (commentId) => {
 
 
 const normalizeCommentContent = (content) => {
-    return content.trim();
+    const cleanContent = content.trim();
+
+    if(!cleanContent) {
+        throw new Error('Comment cannot be empty.')
+    }
+
+    return cleanContent;
 };
