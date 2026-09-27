@@ -144,6 +144,9 @@ function PostsPage() {
                             <Text mt={2} color="fg.muted">
                                 by {post.profiles.username} - {formatDate(post.created_at)}
                             </Text>
+                            <Text mt={1} color="fg.muted" fontSize="sm">
+                                {post.commentCount} {post.commentCount === 1 ? 'comment' : 'comments'}
+                            </Text>
 
                             {post.author_id === user.id && (
                                 <HStack mt={4}>

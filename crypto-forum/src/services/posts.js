@@ -12,7 +12,7 @@ export const getPosts = async ({
 
   let query = supabase
     .from('posts')
-    .select('*, profiles(username)')
+    .select('*, profiles(username), comments(count)')
 
   if (search.trim()) {
     query = query.ilike('title', `${search.trim()}%`)
@@ -34,7 +34,10 @@ export const getPosts = async ({
     throw error;
   };
 
-  return data ?? [];
+  return (data ?? []).map((post) => ({
+    ...post,
+    commentCount: post.comments?.[0]?.count ?? 0,
+  }));
 };
 
 export const createPost = async ({ title, content }, authorID) => {
