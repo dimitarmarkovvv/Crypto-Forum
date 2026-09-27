@@ -15,9 +15,11 @@ export const getCommentsByPostId = async (postId) => {
 };
 
 export const createComment = async (content, postId, authorId) => {
+    const cleanContent = normalizeCommentContent(content);
+
     const { data, error } = await supabase.
         from('comments')
-        .insert({ content, post_id: postId, author_id: authorId })
+        .insert({ cleanContent, post_id: postId, author_id: authorId })
         .select('*, profiles(username)')
         .single()
 
@@ -29,9 +31,11 @@ export const createComment = async (content, postId, authorId) => {
 };
 
 export const updateComment = async (commentId, content) => {
+    const cleanContent = normalizeCommentContent(content);
+    
     const { data, error } = await supabase
         .from('comments')
-        .update({ content })
+        .update({ cleanContent })
         .eq('id', commentId)
         .select('*, profiles(username)')
         .single();
@@ -57,3 +61,8 @@ export const deleteComment = async (commentId) => {
 
     return data;
 }
+
+
+const normalizeCommentContent = (content) => {
+    return content.trim();
+};
