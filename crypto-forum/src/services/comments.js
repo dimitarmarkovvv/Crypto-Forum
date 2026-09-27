@@ -14,16 +14,61 @@ export const getCommentsByPostId = async (postId) => {
     return data ?? [];
 };
 
-export const createComment = async (content , postId, authorId) => {
-    const { data, error } = await supabase.
-    from('comments')
-    .insert({content, post_id: postId, author_id :authorId})
-    .select('*, profiles(username)')
-    .single()
+export const createComment = async (content, postId, authorId) => {
+    const cleanContent = normalizeCommentContent(content);
 
-    if(error) {
+    const { data, error } = await supabase.
+        from('comments')
+        .insert({ cleanContent, post_id: postId, author_id: authorId })
+        .select('*, profiles(username)')
+        .single()
+
+    if (error) {
         throw error;
     };
 
     return data ?? null;
+};
+
+export const updateComment = async (commentId, content) => {
+    const cleanContent = normalizeCommentContent(content);
+
+    const { data, error } = await supabase
+        .from('comments')
+        .update({ cleanContent })
+        .eq('id', commentId)
+        .select('*, profiles(username)')
+        .single();
+
+    if (error) {
+        throw error;
+    }
+
+    return data;
+}
+
+export const deleteComment = async (commentId) => {
+    const { data, error } = await supabase
+    .froom('comments')
+    .delete()
+    .eq('id', commentId)
+    .select()
+    .single();
+
+    if(error) {
+        throw error;
+    }
+
+    return data;
+}
+
+
+const normalizeCommentContent = (content) => {
+    const cleanContent = content.trim();
+
+    if(!cleanContent) {
+        throw new Error('Comment cannot be empty.')
+    }
+
+    return cleanContent;
 };
