@@ -19,7 +19,11 @@ export const createComment = async (content, postId, authorId) => {
 
     const { data, error } = await supabase.
         from('comments')
-        .insert({ cleanContent, post_id: postId, author_id: authorId })
+        .insert({
+            cleanContent,
+            post_id: postId,
+            author_id: authorId
+        })
         .select('*, profiles(username)')
         .single()
 
@@ -35,7 +39,9 @@ export const updateComment = async (commentId, content) => {
 
     const { data, error } = await supabase
         .from('comments')
-        .update({ cleanContent })
+        .update({
+            cleanContent
+        })
         .eq('id', commentId)
         .select('*, profiles(username)')
         .single();
@@ -49,13 +55,13 @@ export const updateComment = async (commentId, content) => {
 
 export const deleteComment = async (commentId) => {
     const { data, error } = await supabase
-    .froom('comments')
-    .delete()
-    .eq('id', commentId)
-    .select()
-    .single();
+        .from('comments')
+        .delete()
+        .eq('id', commentId)
+        .select()
+        .single();
 
-    if(error) {
+    if (error) {
         throw error;
     }
 
@@ -66,7 +72,7 @@ export const deleteComment = async (commentId) => {
 const normalizeCommentContent = (content) => {
     const cleanContent = content.trim();
 
-    if(!cleanContent) {
+    if (!cleanContent) {
         throw new Error('Comment cannot be empty.')
     }
 
