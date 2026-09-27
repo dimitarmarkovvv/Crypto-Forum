@@ -14,16 +14,31 @@ export const getCommentsByPostId = async (postId) => {
     return data ?? [];
 };
 
-export const createComment = async (content , postId, authorId) => {
+export const createComment = async (content, postId, authorId) => {
     const { data, error } = await supabase.
-    from('comments')
-    .insert({content, post_id: postId, author_id :authorId})
-    .select('*, profiles(username)')
-    .single()
+        from('comments')
+        .insert({ content, post_id: postId, author_id: authorId })
+        .select('*, profiles(username)')
+        .single()
 
-    if(error) {
+    if (error) {
         throw error;
     };
 
     return data ?? null;
 };
+
+export const updateComment = async (commentId, content) => {
+    const { data, error } = await supabase
+        .from('comments')
+        .update({ content })
+        .eq('id', commentId)
+        .select('*, profiles(username)')
+        .single();
+
+    if (error) {
+        throw error;
+    }
+
+    return data;
+}
