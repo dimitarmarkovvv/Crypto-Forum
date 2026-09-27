@@ -42,3 +42,18 @@ export const updateComment = async (commentId, content) => {
 
     return data;
 }
+
+export const deleteComment = async (commentId) => {
+    const { data, error } = await supabase
+    .froom('comments')
+    .delete()
+    .eq('id', commentId)
+    .select()
+    .single();
+
+    if(error) {
+        throw error;
+    }
+
+    return data;
+}
