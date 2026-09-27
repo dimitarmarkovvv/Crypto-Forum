@@ -4,6 +4,7 @@ import { getPostById, updatePost } from "../services/posts";
 import { useEffect, useState } from "react";
 import { Button, Center, Container, Field, Heading, Input, Spinner, Stack, Textarea } from '@chakra-ui/react';
 import { toaster } from '../components/ui/toast-store.js';
+import { useAuth } from "../hooks/useAuth.js";
 
 function EditPostPage() {
     const navigate = useNavigate();
@@ -12,6 +13,7 @@ function EditPostPage() {
     const [loading, setLoading] = useState(false);
     const { id } = useParams();
     const [pageLoading, setPageLoading] = useState(true);
+    const { user } = useAuth();
 
     useEffect(() => {
         const loadPost = async () => {
@@ -19,6 +21,17 @@ function EditPostPage() {
 
             try {
                 const post = await getPostById(id);
+
+                if (post.author_id !== user.id) {
+                    toaster.create({
+                        title: 'You can only edit your own posts',
+                        type: 'error',
+                    });
+
+                    navigate('/posts', {replace: true})
+                    return;
+                }
+
                 setTitle(post.title);
                 setContent(post.content);
             } catch (e) {
@@ -29,7 +42,7 @@ function EditPostPage() {
         };
 
         loadPost();
-    }, [id]);
+    }, [id, user.id, navigate]);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
