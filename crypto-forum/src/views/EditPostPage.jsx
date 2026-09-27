@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { getPostById, updatePost } from "../services/posts";
-import { useEffect, useState } from "react";
+import { useEffect, useState} from "react";
 import { Button, Center, Container, Field, Heading, Input, Spinner, Stack, Textarea } from '@chakra-ui/react';
 import { toaster } from '../components/ui/toast-store.js';
 import { useAuth } from "../hooks/useAuth.js";
@@ -24,6 +24,7 @@ function EditPostPage() {
 
                 if (post.author_id !== user.id) {
                     toaster.create({
+                        id: 'unauthorized-edit-post',
                         title: 'You can only edit your own posts',
                         type: 'error',
                     });
