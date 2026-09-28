@@ -20,7 +20,7 @@ export const createComment = async (content, postId, authorId) => {
     const { data, error } = await supabase.
         from('comments')
         .insert({
-            cleanContent,
+            content: cleanContent,
             post_id: postId,
             author_id: authorId
         })
@@ -40,7 +40,7 @@ export const updateComment = async (commentId, content) => {
     const { data, error } = await supabase
         .from('comments')
         .update({
-            cleanContent
+            content: cleanContent
         })
         .eq('id', commentId)
         .select('*, profiles(username)')
