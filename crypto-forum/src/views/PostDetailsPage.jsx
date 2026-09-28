@@ -8,6 +8,7 @@ import { formatDate } from "../utils/formatDate.js";
 import { useAuth } from "../hooks/useAuth.js";
 import { getCommentsByPostId, createComment } from "../services/comments.js";
 import { castVote, getPostVotes, removeVote } from "../services/votes.js";
+import { buildCommentTree } from '../utils/buildCommentTree.js';
 
 function PostDetailsPage() {
     const navigate = useNavigate();
@@ -19,12 +20,29 @@ function PostDetailsPage() {
     const [newComments, setNewComments] = useState('');
     const [score, setScore] = useState(0);
     const [userVote, setUserVote] = useState(0);
+    const [replyingTo, setReplyingTo] = useState(null);
+    const [replyContent, setReplyContent] = useState('');
 
-    const handleComment = async () => {
+    const commentTree = buildCommentTree(comments)
+
+    const handleComment = async (parentCommentId = null) => {
+        const content = parentCommentId ? replyContent : newComments;
         try {
-            const comment = await createComment(newComments, id, user.id);
-            setComments((prev) => [...prev, comment]);
-            setNewComments('');
+            const comment = await createComment(
+                content,
+                id,
+                user.id,
+                parentCommentId
+            );
+
+            setComments((prev) => [...prev, comment])
+
+            if (parentCommentId) {
+                setReplyContent('')
+                setReplyingTo(null);
+            } else {
+                setNewComments('');
+            }
         } catch (error) {
             toaster.create({ title: error.message, type: 'error' });
         }
@@ -40,16 +58,16 @@ function PostDetailsPage() {
     };
 
     const handleVoteValue = async (value) => {
-        try{
-        if(userVote === value){
-            await removeVote(id, user.id, value);
-        } else {
-            await castVote(id, user.id, value);
-        };
+        try {
+            if (userVote === value) {
+                await removeVote(id, user.id, value);
+            } else {
+                await castVote(id, user.id, value);
+            };
 
-        const { score: fetchedScore, userVote: fetchedUserVote } = await getPostVotes(id, user.id);
-        setScore(fetchedScore);
-        setUserVote(fetchedUserVote);
+            const { score: fetchedScore, userVote: fetchedUserVote } = await getPostVotes(id, user.id);
+            setScore(fetchedScore);
+            setUserVote(fetchedUserVote);
 
         } catch (error) {
             toaster.create({ title: error.message, type: 'error' });
@@ -84,6 +102,107 @@ function PostDetailsPage() {
         );
     };
 
+const renderComment = (comment, depth = 0, parentComment = null) => {
+    const isRootComment = depth === 0;
+    const shouldIndent = depth > 0 && depth <= 3;
+    const isDeepReply = depth > 3;
+
+    return (
+        <Box
+            key={comment.id}
+            ml={shouldIndent ? 6 : 0}
+            mt={depth > 0 ? 2 : 0}
+        >
+            <Box
+                borderWidth={isRootComment ? '1px' : '0'}
+                borderRadius={isRootComment ? 'md' : '0'}
+                borderLeftWidth={!isRootComment && depth <= 3 ? '1px' : '0'}
+                p={isRootComment ? 4 : 0}
+                pl={!isRootComment && depth <= 3 ? 3 : 0}
+                py={!isRootComment ? 2 : undefined}
+            >
+                {isDeepReply && parentComment && (
+                    <Text
+                        fontSize="xs"
+                        color="fg.muted"
+                        mb={1}
+                    >
+                        Replying to {parentComment.profiles.username}
+                    </Text>
+                )}
+
+                <Text>{comment.content}</Text>
+
+                <Text
+                    fontSize="sm"
+                    color="fg.muted"
+                    mt={1}
+                >
+                    by {comment.profiles.username} — {formatDate(comment.created_at)}
+                </Text>
+
+                <Button
+                    size="xs"
+                    variant="ghost"
+                    mt={1}
+                    onClick={() => {
+                        setReplyingTo(comment.id);
+                        setReplyContent('');
+                    }}
+                >
+                    Reply
+                </Button>
+
+                {replyingTo === comment.id && (
+                    <Box mt={2}>
+                        <Textarea
+                            size="sm"
+                            placeholder={`Reply to ${comment.profiles.username}...`}
+                            value={replyContent}
+                            onChange={(event) =>
+                                setReplyContent(event.target.value)
+                            }
+                        />
+
+                        <HStack mt={2}>
+                            <Button
+                                size="xs"
+                                onClick={() =>
+                                    handleComment(comment.id)
+                                }
+                            >
+                                Reply
+                            </Button>
+
+                            <Button
+                                size="xs"
+                                variant="ghost"
+                                onClick={() => {
+                                    setReplyingTo(null);
+                                    setReplyContent('');
+                                }}
+                            >
+                                Cancel
+                            </Button>
+                        </HStack>
+                    </Box>
+                )}
+            </Box>
+
+            {comment.replies?.length > 0 && (
+                <Box>
+                    {comment.replies.map((reply) =>
+                        renderComment(
+                            reply,
+                            depth + 1,
+                            comment
+                        )
+                    )}
+                </Box>
+            )}
+        </Box>
+    );
+};
     return (
         <Container maxW="3xl" py={10}>
             <Heading mb={6}>{post.title}</Heading>
@@ -129,30 +248,33 @@ function PostDetailsPage() {
             <Heading size="md" mt={8} mb={4}>Comments</Heading>
 
             <Stack gap={4}>
-                {comments.length === 0 ? (
+                {commentTree.length === 0 ? (
                     <Text>No comments yet.</Text>
                 ) : (
-                    comments.map((comment) => (
-                        <Box key={comment.id} borderWidth="1px" borderRadius="md" p={3}>
-                            <Text>{comment.content}</Text>
-                            <Text fontSize="sm" color="fg.muted">
-                                by {comment.profiles.username} — {formatDate(comment.created_at)}
-                            </Text>
-                        </Box>
-                    ))
+                    commentTree.map((comment) =>
+                        renderComment(comment)
+                    )
                 )}
             </Stack>
 
-            <Textarea
-                mt={4}
-                placeholder="Write a comment..."
-                value={newComments}
-                onChange={(event) => setNewComments(event.target.value)}
-            />
+            <form
+                onSubmit={(event) => {
+                    event.preventDefault();
+                    handleComment();
+                }}
+            >
+                <Textarea
+                    mt={4}
+                    placeholder="Write a comment..."
+                    value={newComments}
+                    onChange={(event) => setNewComments(event.target.value)}
+                    required
+                />
 
-            <Button mt={2} onClick={handleComment}>
-                Post Comment
-            </Button>
+                <Button mt={2} type="submit">
+                    Post Comment
+                </Button>
+            </form>
         </Container>
     );
 };
