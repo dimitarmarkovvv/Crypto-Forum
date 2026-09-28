@@ -14,15 +14,16 @@ export const getCommentsByPostId = async (postId) => {
     return data ?? [];
 };
 
-export const createComment = async (content, postId, authorId) => {
+export const createComment = async (content, postId, authorId, parentCommentId = null) => {
     const cleanContent = normalizeCommentContent(content);
 
     const { data, error } = await supabase.
         from('comments')
         .insert({
-            cleanContent,
+            content: cleanContent,
             post_id: postId,
-            author_id: authorId
+            author_id: authorId,
+            parent_comment_id: parentCommentId,
         })
         .select('*, profiles(username)')
         .single()
@@ -40,7 +41,7 @@ export const updateComment = async (commentId, content) => {
     const { data, error } = await supabase
         .from('comments')
         .update({
-            cleanContent
+            content: cleanContent
         })
         .eq('id', commentId)
         .select('*, profiles(username)')
