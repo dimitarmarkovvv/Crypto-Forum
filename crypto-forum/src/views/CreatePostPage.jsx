@@ -6,7 +6,7 @@ import { Button, Container, Field, Heading, Input, Stack, Textarea } from '@chak
 import { toaster } from '../components/ui/toast-store.js';
 
 function CreatePostPage() {
-    const { user } = useAuth();
+    const { user, profile } = useAuth();
 
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
@@ -20,15 +20,20 @@ function CreatePostPage() {
         const trimmedTitle = title.trim();
         const trimmedContent = content.trim();
 
+        if (profile?.is_blocked) {
+        toaster.create({ title: 'Your account has been blocked.', type: 'error' });
+        return;
+        };
+
         if (trimmedTitle.length < 16 || trimmedTitle.length > 64) {
             toaster.create({ title: 'Title must be between 16 and 64 characters.', type: 'error' });
             return;
-        }
+        };
 
         if (trimmedContent.length < 32 || trimmedContent.length > 8192) {
             toaster.create({ title: 'Content must be between 32 and 8192 characters.', type: 'error' });
             return;
-        }
+        };
 
         try {
             setLoading(true)

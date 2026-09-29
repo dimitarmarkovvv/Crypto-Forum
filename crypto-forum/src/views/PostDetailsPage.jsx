@@ -15,7 +15,7 @@ function PostDetailsPage() {
     const [post, setPost] = useState(null);
     const { id } = useParams();
     const [pageLoading, setPageLoading] = useState(true);
-    const { user } = useAuth();
+    const { user, profile } = useAuth();
     const [comments, setComments] = useState([]);
     const [newComments, setNewComments] = useState('');
     const [score, setScore] = useState(0);
@@ -27,10 +27,14 @@ function PostDetailsPage() {
     const [commentToDelete, setCommentToDelete] = useState(null);
     const [sort, setSort] = useState('newest');
 
-    const commentTree = buildCommentTree(comments)
+    const commentTree = buildCommentTree(comments);
 
     const handleComment = async (parentCommentId = null) => {
         const content = parentCommentId ? replyContent : newComments;
+        if (profile?.is_blocked) {
+            toaster.create({ title: 'Your account has been blocked.', type: 'error' });
+            return;
+        };
         try {
             const comment = await createComment(
                 content,
@@ -49,8 +53,8 @@ function PostDetailsPage() {
             }
         } catch (error) {
             toaster.create({ title: error.message, type: 'error' });
-        }
-    }
+        };
+    };
 
     const handleDelete = async () => {
         try {
@@ -146,7 +150,7 @@ function PostDetailsPage() {
         };
 
         loadPost();
-    }, [id, user.id,sort]);
+    }, [id, user.id, sort]);
 
     if (pageLoading) {
         return (
@@ -385,16 +389,16 @@ function PostDetailsPage() {
                     </Button>
                 </HStack>
             )}
-            
+
             <NativeSelect.Root maxW="200px" mb={4}>
-            <NativeSelect.Field
-                value={sort}
-                onChange={(event) => setSort(event.target.value)}
-            >
-                <option value="newest">Newest</option>
-                <option value="oldest">Oldest</option>
-            </NativeSelect.Field>
-            <NativeSelect.Indicator />
+                <NativeSelect.Field
+                    value={sort}
+                    onChange={(event) => setSort(event.target.value)}
+                >
+                    <option value="newest">Newest</option>
+                    <option value="oldest">Oldest</option>
+                </NativeSelect.Field>
+                <NativeSelect.Indicator />
             </NativeSelect.Root>
 
             <Heading size="md" mt={8} mb={4}>Comments</Heading>
