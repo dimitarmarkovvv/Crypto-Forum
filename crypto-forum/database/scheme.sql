@@ -94,3 +94,18 @@ create table public.comment_votes (
     constraint unique_comment_vote
         unique (comment_id, user_id)
 );
+
+alter table public.profiles
+    add column avatar_url text,
+    add column location text,
+    add column signature text,
+    add column gender text,
+
+    add constraint location_length
+        check (char_length(location) between 4 and 64),
+
+    add constraint signature_length
+        check (char_length(signature) <= 100),
+
+    add constraint gender_values
+        check (gender in ('male', 'female'));
