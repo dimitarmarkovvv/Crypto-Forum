@@ -197,8 +197,8 @@ function PostDetailsPage() {
 
                             <HStack mt={2}>
                                 <Button
-                                    size="xs"
                                     type="button"
+                                    size="xs"
                                     onClick={() =>
                                         handleEditComment(comment.id)
                                     }
@@ -207,9 +207,9 @@ function PostDetailsPage() {
                                 </Button>
 
                                 <Button
+                                    type="button"
                                     size="xs"
                                     variant="ghost"
-                                    type="button"
                                     onClick={() => {
                                         setEditingCommentId(null);
                                         setEditCommentContent('');
@@ -220,61 +220,78 @@ function PostDetailsPage() {
                             </HStack>
                         </Box>
                     ) : (
-                        <Text>{comment.content}</Text>
+                        <>
+                            {comment.is_deleted ? (
+                                <Text
+                                    fontStyle="italic"
+                                    color="fg.muted"
+                                >
+                                    [deleted]
+                                </Text>
+                            ) : (
+                                <Text>{comment.content}</Text>
+                            )}
+                        </>
                     )}
 
-                    <Text
-                        fontSize="sm"
-                        color="fg.muted"
-                        mt={1}
-                    >
-                        by {comment.profiles.username} —{' '}
-                        {formatDate(comment.created_at)}
-                    </Text>
-
-                    <HStack w="full" mt={1}>
-                        <Button
-                            size="xs"
-                            variant="ghost"
-                            onClick={() => {
-                                setReplyingTo(comment.id);
-                                setReplyContent('');
-                            }}
+                    {!comment.is_deleted && (
+                        <Text
+                            fontSize="sm"
+                            color="fg.muted"
+                            mt={1}
                         >
-                            Reply
-                        </Button>
+                            by {comment.profiles.username} - {' '}
+                            {formatDate(comment.created_at)}
+                        </Text>
+                    )}
 
-                        {isOwner && (
-                            <HStack ml="auto">
-                                <Button
-                                    size="xs"
-                                    variant="ghost"
-                                    onClick={() => {
-                                        setEditingCommentId(comment.id);
-                                        setEditCommentContent(
-                                            comment.content
-                                        );
-                                    }}
-                                >
-                                    Edit
-                                </Button>
+                    {!comment.is_deleted && (
+                        <HStack w="full" mt={1}>
+                            <Button
+                                type="button"
+                                size="xs"
+                                variant="ghost"
+                                onClick={() => {
+                                    setReplyingTo(comment.id);
+                                    setReplyContent('');
+                                }}
+                            >
+                                Reply
+                            </Button>
 
-                                <Button
-                                    type="button"
-                                    size="xs"
-                                    variant="ghost"
-                                    colorPalette="red"
-                                    onClick={() =>
-                                        setCommentToDelete(comment.id)
-                                    }
-                                >
-                                    Delete
-                                </Button>
-                            </HStack>
-                        )}
-                    </HStack>
+                            {isOwner && (
+                                <HStack ml="auto">
+                                    <Button
+                                        type="button"
+                                        size="xs"
+                                        variant="ghost"
+                                        onClick={() => {
+                                            setEditingCommentId(comment.id);
+                                            setEditCommentContent(
+                                                comment.content
+                                            );
+                                        }}
+                                    >
+                                        Edit
+                                    </Button>
 
-                    {replyingTo === comment.id && (
+                                    <Button
+                                        type="button"
+                                        size="xs"
+                                        variant="ghost"
+                                        colorPalette="red"
+                                        onClick={() =>
+                                            setCommentToDelete(comment.id)
+                                        }
+                                    >
+                                        Delete
+                                    </Button>
+                                </HStack>
+                            )}
+                        </HStack>
+                    )}
+
+                    {replyingTo === comment.id && !comment.is_deleted && (
                         <Box mt={2}>
                             <Textarea
                                 size="sm"
@@ -287,6 +304,7 @@ function PostDetailsPage() {
 
                             <HStack mt={2}>
                                 <Button
+                                    type="button"
                                     size="xs"
                                     onClick={() =>
                                         handleComment(comment.id)
@@ -296,6 +314,7 @@ function PostDetailsPage() {
                                 </Button>
 
                                 <Button
+                                    type="button"
                                     size="xs"
                                     variant="ghost"
                                     onClick={() => {

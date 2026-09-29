@@ -57,9 +57,13 @@ export const updateComment = async (commentId, content) => {
 export const deleteComment = async (commentId) => {
     const { data, error } = await supabase
         .from('comments')
-        .delete()
+        .update({
+            content: '[deleted]',
+            is_deleted: true,
+            deleted_at: new Date().toISOString(),
+        })
         .eq('id', commentId)
-        .select()
+        .select('*, profiles(username)')
         .single();
 
     if (error) {
