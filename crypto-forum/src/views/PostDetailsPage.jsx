@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { deletePost, getPostById } from "../services/posts";
 import { useEffect, useState } from "react";
-import { Button, Center, Container, Heading, Spinner, HStack, Text, Box, Stack, Textarea, Dialog, Portal } from '@chakra-ui/react';
+import { Button, Center, Container, Heading, Spinner, HStack, Text, Box, Stack, Textarea, Dialog, Portal, NativeSelect } from '@chakra-ui/react';
 import { toaster } from '../components/ui/toast-store.js';
 import { formatDate } from "../utils/formatDate.js";
 import { useAuth } from "../hooks/useAuth.js";
@@ -25,6 +25,7 @@ function PostDetailsPage() {
     const [editingCommentId, setEditingCommentId] = useState(null);
     const [editCommentContent, setEditCommentContent] = useState('');
     const [commentToDelete, setCommentToDelete] = useState(null);
+    const [sort, setSort] = useState('newest');
 
     const commentTree = buildCommentTree(comments)
 
@@ -132,7 +133,7 @@ function PostDetailsPage() {
             try {
                 const post = await getPostById(id);
                 setPost(post);
-                const comment = await getCommentsByPostId(id);
+                const comment = await getCommentsByPostId(id, sort);
                 setComments(comment);
                 const { score: fetchedScore, userVote: fetchedUserVote } = await getPostVotes(id, user.id);
                 setScore(fetchedScore);
@@ -145,7 +146,7 @@ function PostDetailsPage() {
         };
 
         loadPost();
-    }, [id, user.id]);
+    }, [id, user.id,sort]);
 
     if (pageLoading) {
         return (
@@ -384,6 +385,17 @@ function PostDetailsPage() {
                     </Button>
                 </HStack>
             )}
+            
+            <NativeSelect.Root maxW="200px" mb={4}>
+            <NativeSelect.Field
+                value={sort}
+                onChange={(event) => setSort(event.target.value)}
+            >
+                <option value="newest">Newest</option>
+                <option value="oldest">Oldest</option>
+            </NativeSelect.Field>
+            <NativeSelect.Indicator />
+            </NativeSelect.Root>
 
             <Heading size="md" mt={8} mb={4}>Comments</Heading>
 
