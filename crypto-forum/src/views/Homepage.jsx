@@ -5,9 +5,10 @@ import { useState, useEffect } from 'react';
 import { getForumStats, getMostCommentedPosts, getRecentPosts } from '../services/homepage';
 import { formatDate } from '../utils/formatDate.js'
 import { Box, Button, Center, Container, Heading, Spinner, Stack, Text } from '@chakra-ui/react';
+import { getAvatarUrl } from '../services/profiles.js';
 
 function HomePage() {
-    const { user, loading } = useAuth();
+    const { user, profile ,loading } = useAuth();
     const [stats, setStats] = useState(null);
     const [posts, setPosts] = useState([]);
     const [comments, setComments] = useState([]);
@@ -52,6 +53,9 @@ return (
             <Stack direction="row" align="center" gap={4} mt={4}>
                 <Text>Logged in as: {user.email}</Text>
                 <Button size="sm" onClick={handleLogout}>Logout</Button>
+                <Button size="sm" onClick={() => navigation('/profile/edit')}>Edit</Button>
+                {profile?.avatar_url && (
+                <img src={getAvatarUrl(profile.avatar_url)} alt="avatar" width={40} height={40} style={{ borderRadius: '50%' }} />)}
             </Stack>
         ) : (
             <Text mt={4}>You are logged out</Text>

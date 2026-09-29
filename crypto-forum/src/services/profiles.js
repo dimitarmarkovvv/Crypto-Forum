@@ -1,0 +1,51 @@
+import { supabase } from "../supabase/supabaseClient";
+
+export const updateProfile = async (userId, { first_name, last_name, location, signature, gender }) => {
+    const { data, error } = await supabase
+    .from('profiles')
+    .update({first_name, last_name, location, signature, gender})
+    .eq('id', userId)
+    .select()
+    .single();
+
+    if(error){
+        throw error;
+    };
+
+    return data ?? null;
+};
+
+export const uploadAvatar = async (userId, file, oldPath = null) => {
+  if (oldPath) {
+    await supabase.storage.from('avatars').remove([oldPath]);
+  };
+
+  const path = `${userId}/${Date.now()}-${file.name}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('avatars')
+    .upload(path, file);
+
+  if (uploadError) {
+    throw uploadError;
+  };
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({ avatar_url: path })
+    .eq('id', userId)
+    .select()
+    .single();
+
+  if (error) {
+    throw error;
+  };
+
+  return data ?? null;
+};
+
+export const getAvatarUrl = (path) => {
+  if (!path) return null;
+  const { data } = supabase.storage.from('avatars').getPublicUrl(path);
+  return data.publicUrl;
+};
