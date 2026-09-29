@@ -52,6 +52,7 @@ return (
         {user ? (
             <Stack direction="row" align="center" gap={4} mt={4}>
                 <Text>Logged in as: {user.email}</Text>
+                <Button size="sm" onClick={() => navigation('/users/search')}>Search Users</Button>
                 <Button size="sm" onClick={handleLogout}>Logout</Button>
                 <Button size="sm" onClick={() => navigation('/profile/edit')}>Edit</Button>
                 {profile?.avatar_url && (
