@@ -6,8 +6,7 @@ create table public.profiles (
     last_name text not null,
     email text not null unique,
 
-    role text not null default 'user'
-        check (role in ('user', 'admin')),
+    role text not null default 'user',
 
     is_blocked boolean not null default false,
 
@@ -115,3 +114,10 @@ alter table public.profiles
 
     add constraint gender_values
         check (gender in ('male', 'female'));
+
+alter table public.profiles
+    drop constraint profiles_role_check;
+
+alter table public.profiles
+    add constraint profiles_role_check
+        check (role in ('user', 'moderator', 'admin'));

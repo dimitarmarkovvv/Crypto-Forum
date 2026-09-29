@@ -130,3 +130,31 @@ revoke all on function public.search_users(text) from public;
 
 grant execute on function public.search_users(text)
 to authenticated;
+
+-- Promote user role
+-- Only callable successfully by admins
+
+create or replace function public.promote_user(target_user_id uuid, new_role text)
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+    if not exists (
+        select 1 from public.profiles
+        where id = auth.uid() and role = 'admin'
+    ) then
+        raise exception 'Only admins can promote users.';
+    end if;
+
+    update public.profiles
+    set role = new_role
+    where id = target_user_id;
+end;
+$$;
+
+revoke all on function public.promote_user(uuid, text) from public;
+
+grant execute on function public.promote_user(uuid, text)
+to authenticated;

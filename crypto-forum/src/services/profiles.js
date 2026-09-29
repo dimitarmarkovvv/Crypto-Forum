@@ -59,3 +59,13 @@ export const searchUsers = async (searchTerm) => {
 
   return data ?? [];
 };
+
+export const promoteUser = async (targetUserId, newRole) => {
+  const {data, error} = await supabase.rpc('promote_user', { target_user_id: targetUserId, new_role: newRole });
+
+  if(error){
+    throw error;
+  };
+
+  return data ?? null;
+};
