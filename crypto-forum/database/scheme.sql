@@ -49,8 +49,14 @@ create table public.comments (
         references public.profiles(id)
         on delete cascade,
 
+    parent_comment_id uuid
+        references public.comments(id),
+
     content text not null
         check (char_length(trim(content)) > 0),
+
+    is_deleted boolean not null default false,
+    deleted_at timestamptz,
 
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()

@@ -41,11 +41,6 @@ for update
 using (author_id = auth.uid())
 with check (author_id = auth.uid());
 
-create policy "Users can delete their own comments"
-on public.comments
-for delete
-using (author_id = auth.uid());
-
 -- Post votes
 alter table public.post_votes enable row level security;
 
@@ -69,6 +64,8 @@ create policy "Users can delete their own post votes"
 on public.post_votes
 for delete
 using (user_id = auth.uid());
+
+revoke delete on public.comments from authenticated;
 
 -- Comment votes
 alter table public.comment_votes enable row level security;
