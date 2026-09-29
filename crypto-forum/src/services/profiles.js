@@ -49,3 +49,13 @@ export const getAvatarUrl = (path) => {
   const { data } = supabase.storage.from('avatars').getPublicUrl(path);
   return data.publicUrl;
 };
+
+export const searchUsers = async (searchTerm) => {
+  const {data, error} = await supabase.rpc('search_users', {search_term: searchTerm});
+
+  if(error){
+    throw error;
+  };
+
+  return data ?? [];
+};

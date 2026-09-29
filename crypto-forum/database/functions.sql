@@ -94,3 +94,39 @@ revoke all on function public.get_most_commented_posts() from public;
 
 grant execute on function public.get_most_commented_posts()
 to anon, authenticated;
+
+-- Search users
+-- Returns profiles matching username, email, or first+last name
+
+create or replace function public.search_users(search_term text)
+returns table (
+    id uuid,
+    username text,
+    first_name text,
+    last_name text,
+    email text,
+    avatar_url text
+)
+language sql
+security invoker
+set search_path = ''
+as $$
+    select
+        p.id,
+        p.username,
+        p.first_name,
+        p.last_name,
+        p.email,
+        p.avatar_url
+    from public.profiles p
+    where
+        p.username ilike '%' || search_term || '%'
+        or p.email ilike '%' || search_term || '%'
+        or (p.first_name || ' ' || p.last_name) ilike '%' || search_term || '%'
+    limit 20;
+$$;
+
+revoke all on function public.search_users(text) from public;
+
+grant execute on function public.search_users(text)
+to authenticated;
