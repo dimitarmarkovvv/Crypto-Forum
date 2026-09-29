@@ -9,7 +9,10 @@ using (true);
 create policy "Users can create their own posts"
 on public.posts
 for insert
-with check (author_id = auth.uid());
+with check (
+    author_id = auth.uid()
+    and (select is_blocked from public.profiles where id = auth.uid()) = false
+);
 
 create policy "Users can update their own posts"
 on public.posts
@@ -33,7 +36,10 @@ using (true);
 create policy "Users can create their own comments"
 on public.comments
 for insert
-with check (author_id = auth.uid());
+with check (
+    author_id = auth.uid()
+    and (select is_blocked from public.profiles where id = auth.uid()) = false
+);
 
 create policy "Users can update their own comments"
 on public.comments
