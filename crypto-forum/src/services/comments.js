@@ -1,11 +1,11 @@
 import { supabase } from "../supabase/supabaseClient"
 
-export const getCommentsByPostId = async (postId) => {
+export const getCommentsByPostId = async (postId, sort = 'newest') => {
     const { data, error } = await supabase
         .from('comments')
         .select('*, profiles(username)')
         .eq('post_id', postId)
-        .order('created_at', { ascending: true });
+        .order('created_at', {ascending: sort === 'oldest'});
 
     if (error) {
         throw error;
