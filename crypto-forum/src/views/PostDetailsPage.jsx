@@ -7,7 +7,7 @@ import { toaster } from '../components/ui/toast-store.js';
 import { formatDate } from "../utils/formatDate.js";
 import { useAuth } from "../hooks/useAuth.js";
 import { getCommentsByPostId, createComment, updateComment, deleteComment } from "../services/comments.js";
-import { castVote, getPostVotes, removeVote } from "../services/votes.js";
+import { castVote, getPostVotes, removeVote, castCommentVote, deleteCommentVote, getCommentVotes } from "../services/votes.js";
 import { buildCommentTree } from '../utils/buildCommentTree.js';
 
 function PostDetailsPage() {
@@ -26,6 +26,7 @@ function PostDetailsPage() {
     const [editCommentContent, setEditCommentContent] = useState('');
     const [commentToDelete, setCommentToDelete] = useState(null);
     const [sort, setSort] = useState('newest');
+    const [commentVotes, setCommentVotes] = useState({});
 
     const commentTree = buildCommentTree(comments);
 
@@ -82,6 +83,30 @@ function PostDetailsPage() {
         }
     };
 
+    const handleCommentVote = async (commentId, value) => {
+        try {
+            const currentVote = commentVotes[commentId]?.userVote ?? 0;
+
+            if (currentVote === value) {
+                await deleteCommentVote(commentId, user.id);
+            } else {
+                await castCommentVote(commentId, user.id, value);
+            }
+
+            const fetchedCommentVotes = await getCommentVotes(
+                comments.map((comment) => comment.id),
+                user.id
+            );
+
+            setCommentVotes(fetchedCommentVotes)
+        } catch (error) {
+            toaster.create({
+                title: error.message,
+                type: 'error',
+            });
+        }
+    }
+
     const handleEditComment = async (commentId) => {
         try {
             const updatedComment = await updateComment(
@@ -137,8 +162,17 @@ function PostDetailsPage() {
             try {
                 const post = await getPostById(id);
                 setPost(post);
-                const comment = await getCommentsByPostId(id, sort);
-                setComments(comment);
+                const commentData = await getCommentsByPostId(id, sort);
+                setComments(commentData);
+
+                const commentIds = commentData.map((comment) => comment.id);
+                const fetchedCommentVotes = await getCommentVotes(
+                    commentIds,
+                    user.id
+                );
+
+                setCommentVotes(fetchedCommentVotes)
+
                 const { score: fetchedScore, userVote: fetchedUserVote } = await getPostVotes(id, user.id);
                 setScore(fetchedScore);
                 setUserVote(fetchedUserVote);
@@ -163,6 +197,11 @@ function PostDetailsPage() {
         const shouldIndent = depth > 0 && depth <= 3;
         const isDeepReply = depth > 3;
         const isOwner = comment.author_id === user.id;
+
+        const voteData = commentVotes[comment.id] ?? {
+            score: 0,
+            userVote: 0,
+        };
 
         return (
             <Box
@@ -255,6 +294,37 @@ function PostDetailsPage() {
                             <Button
                                 type="button"
                                 size="xs"
+                                colorPalette={voteData.userVote === 1 ? 'green' : 'gray'}
+                                onClick={() =>
+                                    handleCommentVote(comment.id, 1)
+                                }
+                            >
+                                ▲
+                            </Button>
+
+                            <Text
+                                fontSize="sm"
+                                fontWeight="bold"
+                                minW="20px"
+                                textAlign="center"
+                            >
+                                {voteData.score}
+                            </Text>
+
+                            <Button
+                                type="button"
+                                size="xs"
+                                colorPalette={voteData.userVote === -1 ? 'red' : 'gray'}
+                                onClick={() =>
+                                    handleCommentVote(comment.id, -1)
+                                }
+                            >
+                                ▼
+                            </Button>
+
+                            <Button
+                                type="button"
+                                size="xs"
                                 variant="ghost"
                                 onClick={() => {
                                     setReplyingTo(comment.id);
@@ -272,9 +342,7 @@ function PostDetailsPage() {
                                         variant="ghost"
                                         onClick={() => {
                                             setEditingCommentId(comment.id);
-                                            setEditCommentContent(
-                                                comment.content
-                                            );
+                                            setEditCommentContent(comment.content);
                                         }}
                                     >
                                         Edit
