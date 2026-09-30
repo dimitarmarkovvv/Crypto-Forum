@@ -46,3 +46,25 @@ export const removeVote = async (postId, userId) => {
 
   return data ?? null;
 };
+
+
+export const castCommentVote = async (commentId, userId, voteValue) => {
+  const { data, error } = await supabase
+  .from('comment_votes')
+  .upsert(
+    {
+      comment_id: commentId,
+      user_id: userId,
+      vote: voteValue,
+    },
+    {
+      onConflict: 'comment_id,user_id',
+    }
+  )
+
+  if(error) {
+    throw error
+  }
+
+  return data ?? null;
+}
