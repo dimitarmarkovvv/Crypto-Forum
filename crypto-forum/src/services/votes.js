@@ -84,3 +84,37 @@ export const deleteCommentVote = async (commentId, userId) => {
 
   return data ?? null;
 }
+
+export const getCommentVotes = async (commentIds, userId) => {
+    if (commentIds.length === 0) {
+        return {};
+    }
+
+    const { data, error } = await supabase
+        .from('comment_votes')
+        .select('comment_id, user_id, vote')
+        .in('comment_id', commentIds);
+
+    if (error) {
+        throw error;
+    }
+
+    const votes = {};
+
+    commentIds.forEach((commentId) => {
+        votes[commentId] = {
+            score: 0,
+            userVote: 0,
+        };
+    });
+
+    data.forEach((vote) => {
+        votes[vote.comment_id].score += vote.vote;
+
+        if (vote.user_id === userId) {
+            votes[vote.comment_id].userVote = vote.vote;
+        }
+    });
+
+    return votes;
+};
