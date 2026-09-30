@@ -1,18 +1,18 @@
 import { supabase } from "../supabase/supabaseClient";
 
 export const castVote = async (postId, userId, voteValue) => {
-    const { data, error } = await supabase
+  const { data, error } = await supabase
     .from('post_votes')
     .upsert(
-        { post_id: postId, user_id: userId, vote: voteValue },
-        { onConflict: 'post_id,user_id' }
+      { post_id: postId, user_id: userId, vote: voteValue },
+      { onConflict: 'post_id,user_id' }
     );
-    
-    if(error) {
-        throw error;
-    };
 
-    return data ?? null;
+  if (error) {
+    throw error;
+  };
+
+  return data ?? null;
 };
 
 export const getPostVotes = async (postId, userId) => {
@@ -50,20 +50,36 @@ export const removeVote = async (postId, userId) => {
 
 export const castCommentVote = async (commentId, userId, voteValue) => {
   const { data, error } = await supabase
-  .from('comment_votes')
-  .upsert(
-    {
-      comment_id: commentId,
-      user_id: userId,
-      vote: voteValue,
-    },
-    {
-      onConflict: 'comment_id,user_id',
-    }
-  )
+    .from('comment_votes')
+    .upsert(
+      {
+        comment_id: commentId,
+        user_id: userId,
+        vote: voteValue,
+      },
+      {
+        onConflict: 'comment_id,user_id',
+      }
+    )
 
-  if(error) {
+  if (error) {
     throw error
+  }
+
+  return data ?? null;
+}
+
+export const deleteCommentVote = async (commentId, userId) => {
+  const { data, error } = await supabase
+    .from('comment_votes')
+    .delete()
+    .eq('comment_id', commentId)
+    .eq('user_id', userId)
+    .select()
+    .single()
+
+  if (error) {
+    throw error;
   }
 
   return data ?? null;
