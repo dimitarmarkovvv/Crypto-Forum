@@ -39,7 +39,6 @@ export function RegisterPage() {
                     <Field.Root required>
                         <Field.Label>Username</Field.Label>
                         <Input
-                            id='username'
                             type='text'
                             value={username}
                             onChange={(event) => setUsername(event.target.value)}
@@ -50,7 +49,6 @@ export function RegisterPage() {
                     <Field.Root required>
                         <Field.Label>First Name</Field.Label>
                         <Input
-                            id='firstName'
                             type='text'
                             value={firstName}
                             onChange={(event) => setFirstName(event.target.value)}
@@ -61,7 +59,6 @@ export function RegisterPage() {
                     <Field.Root required>
                         <Field.Label>Last Name</Field.Label>
                         <Input
-                            id='lastName'
                             type='text'
                             value={lastName}
                             onChange={(event) => setLastName(event.target.value)}
@@ -72,7 +69,6 @@ export function RegisterPage() {
                     <Field.Root required>
                         <Field.Label>Email</Field.Label>
                         <Input
-                            id='email'
                             type='email'
                             value={email}
                             onChange={(event) => setEmail(event.target.value)}
@@ -83,7 +79,6 @@ export function RegisterPage() {
                     <Field.Root required>
                         <Field.Label>Password</Field.Label>
                         <Input
-                            id='password'
                             type='password'
                             value={password}
                             onChange={(event) => setPassword(event.target.value)}

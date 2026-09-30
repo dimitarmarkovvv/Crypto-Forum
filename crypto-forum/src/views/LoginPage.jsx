@@ -39,7 +39,6 @@ export function LoginPage() {
                     <Field.Root required>
                         <Field.Label>Email</Field.Label>
                         <Input
-                            id='email'
                             type='email'
                             value={email}
                             onChange={(event) => setEmail(event.target.value)}
@@ -50,7 +49,6 @@ export function LoginPage() {
                     <Field.Root required>
                         <Field.Label>Password</Field.Label>
                         <Input
-                            id='password'
                             type='password'
                             value={password}
                             onChange={(event) => setPassword(event.target.value)}
