@@ -1,18 +1,18 @@
 import { supabase } from "../supabase/supabaseClient";
 
 export const castVote = async (postId, userId, voteValue) => {
-    const { data, error } = await supabase
+  const { data, error } = await supabase
     .from('post_votes')
     .upsert(
-        { post_id: postId, user_id: userId, vote: voteValue },
-        { onConflict: 'post_id,user_id' }
+      { post_id: postId, user_id: userId, vote: voteValue },
+      { onConflict: 'post_id,user_id' }
     );
-    
-    if(error) {
-        throw error;
-    };
 
-    return data ?? null;
+  if (error) {
+    throw error;
+  };
+
+  return data ?? null;
 };
 
 export const getPostVotes = async (postId, userId) => {
@@ -45,4 +45,76 @@ export const removeVote = async (postId, userId) => {
   }
 
   return data ?? null;
+};
+
+
+export const castCommentVote = async (commentId, userId, voteValue) => {
+  const { data, error } = await supabase
+    .from('comment_votes')
+    .upsert(
+      {
+        comment_id: commentId,
+        user_id: userId,
+        vote: voteValue,
+      },
+      {
+        onConflict: 'comment_id,user_id',
+      }
+    )
+
+  if (error) {
+    throw error
+  }
+
+  return data ?? null;
+}
+
+export const deleteCommentVote = async (commentId, userId) => {
+  const { data, error } = await supabase
+    .from('comment_votes')
+    .delete()
+    .eq('comment_id', commentId)
+    .eq('user_id', userId)
+    .select()
+    .single()
+
+  if (error) {
+    throw error;
+  }
+
+  return data ?? null;
+}
+
+export const getCommentVotes = async (commentIds, userId) => {
+    if (commentIds.length === 0) {
+        return {};
+    }
+
+    const { data, error } = await supabase
+        .from('comment_votes')
+        .select('comment_id, user_id, vote')
+        .in('comment_id', commentIds);
+
+    if (error) {
+        throw error;
+    }
+
+    const votes = {};
+
+    commentIds.forEach((commentId) => {
+        votes[commentId] = {
+            score: 0,
+            userVote: 0,
+        };
+    });
+
+    (data ?? []).forEach((vote) => {
+        votes[vote.comment_id].score += vote.vote;
+
+        if (vote.user_id === userId) {
+            votes[vote.comment_id].userVote = vote.vote;
+        }
+    });
+
+    return votes;
 };
