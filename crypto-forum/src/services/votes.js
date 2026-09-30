@@ -108,7 +108,7 @@ export const getCommentVotes = async (commentIds, userId) => {
         };
     });
 
-    data.forEach((vote) => {
+    (data ?? []).forEach((vote) => {
         votes[vote.comment_id].score += vote.vote;
 
         if (vote.user_id === userId) {
