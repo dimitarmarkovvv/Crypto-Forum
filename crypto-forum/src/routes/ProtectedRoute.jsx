@@ -9,7 +9,7 @@ export const ProtectedRoute = () => {
     if (loading) {
         return (
             <Center py={20}>
-                <Spinner size="lg" />
+                <Spinner size="lg" data-testid="loading-spinner" />
             </Center>
         );
     };
