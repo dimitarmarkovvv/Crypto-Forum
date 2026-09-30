@@ -5,7 +5,7 @@ export const getCommentsByPostId = async (postId, sort = 'newest') => {
         .from('comments')
         .select('*, profiles(username)')
         .eq('post_id', postId)
-        .order('created_at', {ascending: sort === 'oldest'});
+        .order('created_at', { ascending: sort === 'oldest' });
 
     if (error) {
         throw error;
@@ -55,22 +55,53 @@ export const updateComment = async (commentId, content) => {
 }
 
 export const deleteComment = async (commentId) => {
-    const { data, error } = await supabase
-        .from('comments')
-        .update({
-            content: '[deleted]',
-            is_deleted: true,
-            deleted_at: new Date().toISOString(),
-        })
-        .eq('id', commentId)
-        .select('*, profiles(username)')
-        .single();
 
-    if (error) {
-        throw error;
+    const { count, error: countError } = await supabase
+        .from('comments')
+        .select('id', {
+            count: 'exact',
+            head: true,
+        })
+        .eq('parent_comment_id', commentId)
+
+    if (countError) {
+        throw countError;
     }
 
-    return data;
+
+    //comment has replies --> soft delete
+    if (count > 0) {
+        const { data, error } = await supabase
+            .from('comments')
+            .update({
+                content: '[deleted]',
+                is_deleted: true,
+                deleted_at: new Date().toISOString(),
+            })
+            .eq('id', commentId)
+            .select('*, profiles(username)')
+            .single();
+
+        if (error) {
+            throw error;
+        }
+
+        return data;
+    }
+
+    //comment has no replies --> physically delete it
+    const { data, error } = await supabase
+        .from('comments')
+        .delete()
+        .eq('id', commentId)
+        .select()
+        .single()
+
+    if (error) {
+        throw error
+    }
+
+    return data
 }
 
 
