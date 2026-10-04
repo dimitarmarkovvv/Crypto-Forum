@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-    Center, Container, Heading, Image, Spinner, Stack, Text, Box, Grid
+    Center, Container, Heading, Avatar, Spinner, Stack, Text, Box, Grid
 } from '@chakra-ui/react';
 import { getAvatarUrl, getUserProfileById } from '../services/profiles';
 import { getPosts } from '../services/posts.js';
@@ -77,16 +77,23 @@ function UserProfilePage() {
             >
                 <Box>
                     <Stack gap={4}>
-                        {userProfile.avatar_url && (
-                            <Image
-                                src={getAvatarUrl(userProfile.avatar_url)}
-                                alt={`${userProfile.username}'s avatar`}
-                                boxSize="120px"
-                                objectFit="cover"
-                                borderRadius="full"
+                        <Avatar.Root
+                            w="120px"
+                            h="120px"
+                            borderRadius="full"
+                            overflow="hidden"
+                        >
+                            <Avatar.Fallback
+                                name={`${userProfile.first_name} ${userProfile.last_name}`}
                             />
-                        )}
 
+                            {userProfile.avatar_url && (
+                                <Avatar.Image
+                                    src={getAvatarUrl(userProfile.avatar_url)}
+                                    alt={`${userProfile.username}'s avatar`}
+                                />
+                            )}
+                        </Avatar.Root>
                         <Heading size="md">
                             {userProfile.username}
                         </Heading>
@@ -134,11 +141,11 @@ function UserProfilePage() {
                                     p={4}
                                 >
                                     <Heading
-                                     size="sm"
-                                     cursor="pointer"
-                                     _hover={{ textDecoration: 'underline'}}
-                                     onClick={() => navigate(`/posts/${post.id}`)}
-                                     >
+                                        size="sm"
+                                        cursor="pointer"
+                                        _hover={{ textDecoration: 'underline' }}
+                                        onClick={() => navigate(`/posts/${post.id}`)}
+                                    >
                                         {post.title}
                                     </Heading>
 
@@ -180,10 +187,10 @@ function UserProfilePage() {
                                     </Text>
 
                                     <Text
-                                    as="span"
-                                    cursor="pointer"
-                                    _hover={{textDecoration: 'underline'}}
-                                    onClick={() => navigate(`/posts/${comment.posts.id}`)}
+                                        as="span"
+                                        cursor="pointer"
+                                        _hover={{ textDecoration: 'underline' }}
+                                        onClick={() => navigate(`/posts/${comment.posts.id}`)}
                                     >
                                         on {comment.posts.title}
                                     </Text>
