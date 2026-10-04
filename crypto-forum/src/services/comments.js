@@ -94,13 +94,16 @@ export const deleteComment = async (commentId) => {
         .from('comments')
         .delete()
         .eq('id', commentId)
-        .select()
+        .select('id, parent_comment_id')
         .single()
 
     if (error) {
         throw error
     }
 
+
+    await cleanupDeletedParent(data.parent_comment_id)
+    
     return data
 }
 
@@ -135,3 +138,59 @@ const normalizeCommentContent = (content) => {
 
     return cleanContent;
 };
+
+const cleanupDeletedParent = async (commentId) => {
+    if(!commentId) {
+        return;
+    }
+
+    const {data: parent, error: parentError} = await supabase
+    .from('comments')
+    .select('id, parent_comment_id, is_deleted')
+    .eq('id', commentId)
+    .maybeSingle();
+
+    if(parentError) {
+        throw parentError;
+    }
+
+    if(!parent || !parent.is_deleted) {
+        return;
+    }
+
+    const {count, error: countError} = await supabase
+    .from('comments')
+    .select('id', {
+        count: 'exact',
+        head: true,
+    })
+    .eq('parent_comment_id', parent.id)
+
+    if(countError){
+        throw countError;
+    }
+
+    // Deleted parent still has replies, so keep the tombstone.
+    if(count > 0) {
+        return;
+    }
+
+    const {data: deletedParent, error: deletedError} = await supabase
+    .from('comments')
+    .delete()
+    .eq('id', parent.id)
+    .eq('is_deleted', true)
+    .select('id, parent_comment_id')
+    .maybeSingle();
+
+    if(deletedError) {
+        throw deletedError;
+    }
+
+    if(!deletedParent) {
+        return;
+    }
+
+    // Check whether its parent is now also an unused tombstone.
+    await cleanupDeletedParent(deletedParent.parent_comment_id);
+}
