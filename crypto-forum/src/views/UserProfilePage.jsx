@@ -42,7 +42,6 @@ function UserProfilePage() {
 
                 const userComments = await getCommentsByAuthorId(id);
                 setComments(userComments);
-                console.log(userComments)
             } catch (error) {
                 setError(error.message);
             } finally {
