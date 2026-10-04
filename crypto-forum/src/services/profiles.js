@@ -69,3 +69,27 @@ export const promoteUser = async (targetUserId, newRole) => {
 
   return data ?? null;
 };
+
+export const getUserProfileById = async (userId) => {
+  const {data, error } = await supabase
+  .from('profiles')
+  .select(`id,
+    username,
+    first_name,
+    last_name,
+    avatar_url,
+    location,
+    signature,
+    gender,
+    role,
+    created_at
+    `)
+    .eq('id', userId)
+    .single();
+
+    if(error) {
+      throw error;
+    }
+
+    return data
+}
