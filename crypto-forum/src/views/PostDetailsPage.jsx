@@ -284,7 +284,16 @@ function PostDetailsPage() {
                             color="fg.muted"
                             mt={1}
                         >
-                            by {comment.profiles.username} - {' '}
+                            by{' '}
+                            <Text
+                                as="span"
+                                cursor="pointer"
+                                _hover={{ textDecoration: 'underline' }}
+                                onClick={() => navigate(`/users/${comment.author_id}`)}
+                            >
+                                {comment.profiles.username}
+                            </Text>
+                            {' - '}
                             {formatDate(comment.created_at)}
                         </Text>
                     )}
@@ -421,7 +430,17 @@ function PostDetailsPage() {
             <Heading mb={6}>{post.title}</Heading>
 
             <Text mb={4} color="fg.muted">
-                by {post.profiles.username} — {formatDate(post.created_at)}
+                by{' '}
+                <Text
+                    as="span"
+                    cursor="pointer"
+                    _hover={{ textDecoration: 'underline' }}
+                    onClick={() => navigate(`/users/${post.author_id}`)}
+                >
+                    {post.profiles.username}
+                </Text>
+                {' — '}
+                {formatDate(post.created_at)}
             </Text>
 
             <Text mb={6}>{post.content}</Text>

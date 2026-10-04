@@ -104,6 +104,27 @@ export const deleteComment = async (commentId) => {
     return data
 }
 
+export const getCommentsByAuthorId = async (authorId) => {
+    const { data, error } = await supabase
+        .from('comments')
+        .select(`
+        *,
+        posts(
+        id,
+        title
+        )
+        `)
+        .eq('author_id', authorId)
+        .eq('is_deleted', false)
+        .order('created_at', { ascending: false })
+
+    if (error) {
+        throw error
+    }
+
+    return data ?? [];
+}
+
 
 const normalizeCommentContent = (content) => {
     const cleanContent = content.trim();

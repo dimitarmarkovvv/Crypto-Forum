@@ -4,38 +4,38 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getForumStats, getMostCommentedPosts, getRecentPosts } from '../services/homepage';
 import { formatDate } from '../utils/formatDate.js'
-import { Box, Button, Center, Container, Heading, Spinner, Stack, Text } from '@chakra-ui/react';
+import { Box, Button, Center, Container, Heading, Spinner, Stack, Text, Avatar } from '@chakra-ui/react';
 import { getAvatarUrl } from '../services/profiles.js';
 
 function HomePage() {
-    const { user, profile ,loading } = useAuth();
+    const { user, profile, loading } = useAuth();
     const [stats, setStats] = useState(null);
     const [posts, setPosts] = useState([]);
     const [comments, setComments] = useState([]);
-    const navigation = useNavigate();
+    const navigate = useNavigate();
 
     const handleLogout = async () => {
         try {
             await logoutUser();
-            navigation('/login')
+            navigate('/login')
         } catch (error) {
             console.error(error.message);
         };
     };
 
     useEffect(() => {
-    const loadHomePageData = async () => {
-        const statsData = await getForumStats();
-        const postData = await getRecentPosts();
-        const commentData = await getMostCommentedPosts();
+        const loadHomePageData = async () => {
+            const statsData = await getForumStats();
+            const postData = await getRecentPosts();
+            const commentData = await getMostCommentedPosts();
 
-        setPosts(postData);
-        setStats(statsData);
-        setComments(commentData);
-    };
+            setPosts(postData);
+            setStats(statsData);
+            setComments(commentData);
+        };
 
         loadHomePageData();
-    },[]);
+    }, []);
 
     if (loading) {
         return (
@@ -45,60 +45,79 @@ function HomePage() {
         );
     };
 
-return (
-    <Container maxW="3xl" py={10}>
-        <Heading>Crypto Forum</Heading>
+    return (
+        <Container maxW="3xl" py={10}>
+            <Heading>Crypto Forum</Heading>
 
-        {user ? (
-            <Stack direction="row" align="center" gap={4} mt={4}>
-                <Text>Logged in as: {user.email}</Text>
-                <Button size="sm" onClick={() => navigation('/users/search')}>Search Users</Button>
-                <Button size="sm" onClick={handleLogout}>Logout</Button>
-                <Button size="sm" onClick={() => navigation('/profile/edit')}>Edit</Button>
-                {profile?.avatar_url && (
-                <img src={getAvatarUrl(profile.avatar_url)} alt="avatar" width={40} height={40} style={{ borderRadius: '50%' }} />)}
-            </Stack>
-        ) : (
-            <Text mt={4}>You are logged out</Text>
-        )}
+            {user ? (
+                <Stack direction="row" align="center" gap={4} mt={4}>
+                    <Text>Logged in as: {user.email}</Text>
+                    <Button size="sm" onClick={() => navigate('/users/search')}>Search Users</Button>
+                    <Button size="sm" onClick={handleLogout}>Logout</Button>
+                    <Avatar.Root
+                        w="40px"
+                        h="40px"
+                        borderRadius="full"
+                        overflow="hidden"
+                        cursor="pointer"
+                        _hover={{
+                            opacity: 0.8,
+                        }}
+                        onClick={() => navigate(`/users/${user.id}`)}
+                    >
+                        <Avatar.Fallback
+                            name={`${profile.first_name} ${profile.last_name}`}
+                        />
 
-        <Box as="section" mt={8}>
-            <Text>Crypto Forum is a community for discussing cryptocurrency news, trading strategies, and blockchain technology.</Text>
-        </Box>
+                        {profile.avatar_url && (
+                            <Avatar.Image
+                                src={getAvatarUrl(profile.avatar_url)}
+                                alt={`${profile.username}'s avatar`}
+                            />
+                        )}
+                    </Avatar.Root>
+                </Stack>
+            ) : (
+                <Text mt={4}>You are logged out</Text>
+            )}
 
-        {stats && (
             <Box as="section" mt={8}>
-                <Text>Users: {stats.totalUsers}</Text>
-                <Text>Posts: {stats.totalPosts}</Text>
-                <Text>Comments: {stats.totalComments}</Text>
+                <Text>Crypto Forum is a community for discussing cryptocurrency news, trading strategies, and blockchain technology.</Text>
             </Box>
-        )}
 
-        <Box as="section" mt={8}>
-            <Heading size="lg" mb={4}>Recent Posts</Heading>
-            <Stack gap={4}>
-                {posts.map((post) => (
-                    <Box key={post.id}>
-                        <Heading size="md">{post.title}</Heading>
-                        <Text color="fg.muted">by {post.author} — {formatDate(post.created_at)}</Text>
-                    </Box>
-                ))}
-            </Stack>
-        </Box>
+            {stats && (
+                <Box as="section" mt={8}>
+                    <Text>Users: {stats.totalUsers}</Text>
+                    <Text>Posts: {stats.totalPosts}</Text>
+                    <Text>Comments: {stats.totalComments}</Text>
+                </Box>
+            )}
 
-        <Box as="section" mt={8}>
-            <Heading size="lg" mb={4}>Most commented posts</Heading>
-            <Stack gap={4}>
-                {comments.map((comment) => (
-                    <Box key={comment.id}>
-                        <Heading size="md">{comment.title}</Heading>
-                        <Text color="fg.muted">by {comment.author} — {formatDate(comment.created_at)}</Text>
-                    </Box>
-                ))}
-            </Stack>
-        </Box>
-    </Container>
-);
+            <Box as="section" mt={8}>
+                <Heading size="lg" mb={4}>Recent Posts</Heading>
+                <Stack gap={4}>
+                    {posts.map((post) => (
+                        <Box key={post.id}>
+                            <Heading size="md">{post.title}</Heading>
+                            <Text color="fg.muted">by {post.author} — {formatDate(post.created_at)}</Text>
+                        </Box>
+                    ))}
+                </Stack>
+            </Box>
+
+            <Box as="section" mt={8}>
+                <Heading size="lg" mb={4}>Most commented posts</Heading>
+                <Stack gap={4}>
+                    {comments.map((comment) => (
+                        <Box key={comment.id}>
+                            <Heading size="md">{comment.title}</Heading>
+                            <Text color="fg.muted">by {comment.author} — {formatDate(comment.created_at)}</Text>
+                        </Box>
+                    ))}
+                </Stack>
+            </Box>
+        </Container>
+    );
 };
 
 export default HomePage;
