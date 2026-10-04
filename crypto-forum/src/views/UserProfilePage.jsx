@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
     Center, Container, Heading, Image, Spinner, Stack, Text, Box, Grid
 } from '@chakra-ui/react';
@@ -16,6 +16,7 @@ function UserProfilePage() {
     const [error, setError] = useState('');
     const [posts, setPosts] = useState([]);
     const [comments, setComments] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const loadProfile = async () => {
@@ -132,7 +133,12 @@ function UserProfilePage() {
                                     borderRadius="md"
                                     p={4}
                                 >
-                                    <Heading size="sm">
+                                    <Heading
+                                     size="sm"
+                                     cursor="pointer"
+                                     _hover={{ textDecoration: 'underline'}}
+                                     onClick={() => navigate(`/posts/${post.id}`)}
+                                     >
                                         {post.title}
                                     </Heading>
 
@@ -174,9 +180,10 @@ function UserProfilePage() {
                                     </Text>
 
                                     <Text
-                                        mt={2}
-                                        fontSize="sm"
-                                        color="fg.muted"
+                                    as="span"
+                                    cursor="pointer"
+                                    _hover={{textDecoration: 'underline'}}
+                                    onClick={() => navigate(`/posts/${comment.posts.id}`)}
                                     >
                                         on {comment.posts.title}
                                     </Text>
