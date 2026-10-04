@@ -7,9 +7,11 @@ import { getAvatarUrl, getUserProfileById } from '../services/profiles';
 import { getPosts } from '../services/posts.js';
 import { formatDate } from '../utils/formatDate.js';
 import { getCommentsByAuthorId } from '../services/comments.js';
+import { useAuth } from '../hooks/useAuth.js';
 
 function UserProfilePage() {
     const { id } = useParams();
+    const { user} = useAuth();
 
     const [userProfile, setUserProfile] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -145,6 +147,12 @@ function UserProfilePage() {
                             <Text fontStyle="italic">
                                 {userProfile.signature}
                             </Text>
+                        )}
+
+                        {user.id === userProfile.id && (
+                            <Button onClick={() => navigate('/profile/edit')}>
+                                Edit Profile
+                            </Button>
                         )}
                     </Stack>
                 </Box>
