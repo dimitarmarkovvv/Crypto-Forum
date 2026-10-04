@@ -2,13 +2,14 @@ import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { deletePost, getPostById } from "../services/posts";
 import { useEffect, useState } from "react";
-import { Button, Center, Container, Heading, Spinner, HStack, Text, Box, Stack, Textarea, Dialog, Portal, NativeSelect } from '@chakra-ui/react';
+import { Button, Center, Container, Heading, Spinner, HStack, Text, Stack, Textarea, Dialog, Portal, NativeSelect } from '@chakra-ui/react';
 import { toaster } from '../components/ui/toast-store.js';
 import { formatDate } from "../utils/formatDate.js";
 import { useAuth } from "../hooks/useAuth.js";
 import { getCommentsByPostId, createComment, updateComment, deleteComment } from "../services/comments.js";
 import { castVote, getPostVotes, removeVote, castCommentVote, deleteCommentVote, getCommentVotes } from "../services/votes.js";
 import { buildCommentTree } from '../utils/buildCommentTree.js';
+import Comment from '../components/ui/comments/Comment.jsx'
 
 function PostDetailsPage() {
     const navigate = useNavigate();
@@ -192,239 +193,6 @@ function PostDetailsPage() {
         );
     };
 
-    const renderComment = (comment, depth = 0, parentComment = null) => {
-        const isRootComment = depth === 0;
-        const shouldIndent = depth > 0 && depth <= 3;
-        const isDeepReply = depth > 3;
-        const isOwner = comment.author_id === user.id;
-
-        const voteData = commentVotes[comment.id] ?? {
-            score: 0,
-            userVote: 0,
-        };
-
-        return (
-            <Box
-                key={comment.id}
-                ml={shouldIndent ? 6 : 0}
-                mt={depth > 0 ? 2 : 0}
-            >
-                <Box
-                    borderWidth={isRootComment ? '1px' : '0'}
-                    borderRadius={isRootComment ? 'md' : '0'}
-                    borderLeftWidth={
-                        !isRootComment && depth <= 3 ? '1px' : '0'
-                    }
-                    p={isRootComment ? 4 : 0}
-                    pl={!isRootComment && depth <= 3 ? 3 : 0}
-                    py={!isRootComment ? 2 : undefined}
-                >
-                    {isDeepReply && parentComment && (
-                        <Text
-                            fontSize="xs"
-                            color="fg.muted"
-                            mb={1}
-                        >
-                            Replying to {parentComment.profiles.username}
-                        </Text>
-                    )}
-
-                    {editingCommentId === comment.id ? (
-                        <Box>
-                            <Textarea
-                                size="sm"
-                                value={editCommentContent}
-                                onChange={(event) =>
-                                    setEditCommentContent(event.target.value)
-                                }
-                            />
-
-                            <HStack mt={2}>
-                                <Button
-                                    type="button"
-                                    size="xs"
-                                    onClick={() =>
-                                        handleEditComment(comment.id)
-                                    }
-                                >
-                                    Save
-                                </Button>
-
-                                <Button
-                                    type="button"
-                                    size="xs"
-                                    variant="ghost"
-                                    onClick={() => {
-                                        setEditingCommentId(null);
-                                        setEditCommentContent('');
-                                    }}
-                                >
-                                    Cancel
-                                </Button>
-                            </HStack>
-                        </Box>
-                    ) : (
-                        <>
-                            {comment.is_deleted ? (
-                                <Text
-                                    fontStyle="italic"
-                                    color="fg.muted"
-                                >
-                                    [deleted]
-                                </Text>
-                            ) : (
-                                <Text>{comment.content}</Text>
-                            )}
-                        </>
-                    )}
-
-                    {!comment.is_deleted && (
-                        <Text
-                            fontSize="sm"
-                            color="fg.muted"
-                            mt={1}
-                        >
-                            by{' '}
-                            <Text
-                                as="span"
-                                cursor="pointer"
-                                _hover={{ textDecoration: 'underline' }}
-                                onClick={() => navigate(`/users/${comment.author_id}`)}
-                            >
-                                {comment.profiles.username}
-                            </Text>
-                            {' - '}
-                            {formatDate(comment.created_at)}
-                        </Text>
-                    )}
-
-                    {!comment.is_deleted && (
-                        <HStack w="full" mt={1}>
-                            <Button
-                                type="button"
-                                size="xs"
-                                colorPalette={voteData.userVote === 1 ? 'green' : 'gray'}
-                                onClick={() =>
-                                    handleCommentVote(comment.id, 1)
-                                }
-                            >
-                                ▲
-                            </Button>
-
-                            <Text
-                                fontSize="sm"
-                                fontWeight="bold"
-                                minW="20px"
-                                textAlign="center"
-                            >
-                                {voteData.score}
-                            </Text>
-
-                            <Button
-                                type="button"
-                                size="xs"
-                                colorPalette={voteData.userVote === -1 ? 'red' : 'gray'}
-                                onClick={() =>
-                                    handleCommentVote(comment.id, -1)
-                                }
-                            >
-                                ▼
-                            </Button>
-
-                            <Button
-                                type="button"
-                                size="xs"
-                                variant="ghost"
-                                onClick={() => {
-                                    setReplyingTo(comment.id);
-                                    setReplyContent('');
-                                }}
-                            >
-                                Reply
-                            </Button>
-
-                            {isOwner && (
-                                <HStack ml="auto">
-                                    <Button
-                                        type="button"
-                                        size="xs"
-                                        variant="ghost"
-                                        onClick={() => {
-                                            setEditingCommentId(comment.id);
-                                            setEditCommentContent(comment.content);
-                                        }}
-                                    >
-                                        Edit
-                                    </Button>
-
-                                    <Button
-                                        type="button"
-                                        size="xs"
-                                        variant="ghost"
-                                        colorPalette="red"
-                                        onClick={() =>
-                                            setCommentToDelete(comment.id)
-                                        }
-                                    >
-                                        Delete
-                                    </Button>
-                                </HStack>
-                            )}
-                        </HStack>
-                    )}
-
-                    {replyingTo === comment.id && !comment.is_deleted && (
-                        <Box mt={2}>
-                            <Textarea
-                                size="sm"
-                                placeholder={`Reply to ${comment.profiles.username}...`}
-                                value={replyContent}
-                                onChange={(event) =>
-                                    setReplyContent(event.target.value)
-                                }
-                            />
-
-                            <HStack mt={2}>
-                                <Button
-                                    type="button"
-                                    size="xs"
-                                    onClick={() =>
-                                        handleComment(comment.id)
-                                    }
-                                >
-                                    Reply
-                                </Button>
-
-                                <Button
-                                    type="button"
-                                    size="xs"
-                                    variant="ghost"
-                                    onClick={() => {
-                                        setReplyingTo(null);
-                                        setReplyContent('');
-                                    }}
-                                >
-                                    Cancel
-                                </Button>
-                            </HStack>
-                        </Box>
-                    )}
-                </Box>
-
-                {comment.replies?.length > 0 && (
-                    <Box>
-                        {comment.replies.map((reply) =>
-                            renderComment(
-                                reply,
-                                depth + 1,
-                                comment
-                            )
-                        )}
-                    </Box>
-                )}
-            </Box>
-        );
-    };
     return (
         <Container maxW="3xl" py={10}>
             <Heading mb={6}>{post.title}</Heading>
@@ -494,9 +262,29 @@ function PostDetailsPage() {
                 {commentTree.length === 0 ? (
                     <Text>No comments yet.</Text>
                 ) : (
-                    commentTree.map((comment) =>
-                        renderComment(comment)
-                    )
+                    commentTree.map((comment) => (
+                        <Comment
+                            key={comment.id}
+                            comment={comment}
+                            userId={user.id}
+                            commentVotes={commentVotes}
+
+                            editingCommentId={editingCommentId}
+                            editCommentContent={editCommentContent}
+                            setEditingCommentId={setEditingCommentId}
+                            setEditCommentContent={setEditCommentContent}
+                            handleEditComment={handleEditComment}
+
+                            replyingTo={replyingTo}
+                            replyContent={replyContent}
+                            setReplyingTo={setReplyingTo}
+                            setReplyContent={setReplyContent}
+                            handleComment={handleComment}
+
+                            handleCommentVote={handleCommentVote}
+                            setCommentToDelete={setCommentToDelete}
+                        />
+                    ))
                 )}
             </Stack>
 
