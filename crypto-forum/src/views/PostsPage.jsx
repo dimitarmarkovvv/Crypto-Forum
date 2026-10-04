@@ -142,7 +142,17 @@ function PostsPage() {
                             <Text mt={2}>{post.content}</Text>
 
                             <Text mt={2} color="fg.muted">
-                                by {post.profiles.username} - {formatDate(post.created_at)}
+                                by{' '}
+                                <Text
+                                as="span"
+                                cursor="pointer"
+                                _hover={{textDecoration: 'underline'}}
+                                onClick={() => navigate(`/users/${post.author_id}`)}
+                                >
+                                    {post.profiles.username}
+                                </Text>
+                                {'-'}
+                                {formatDate(post.created_at)}
                             </Text>
                             <Text mt={1} color="fg.muted" fontSize="sm">
                                 {post.commentCount} {post.commentCount === 1 ? 'comment' : 'comments'}
