@@ -76,6 +76,12 @@ function HomePage() {
                             />
                         )}
                     </Avatar.Root>
+
+                    {profile?.role === 'admin' && (
+                        <Button onClick={() => navigate('/admin')}>
+                            Admin Dashboard
+                        </Button>
+                    )}
                 </Stack>
             ) : (
                 <Text mt={4}>You are logged out</Text>
