@@ -6,6 +6,7 @@ import {
 import { getAvatarUrl, getUserProfileById } from '../services/profiles';
 import { getPosts } from '../services/posts.js';
 import { formatDate } from '../utils/formatDate.js';
+import { getCommentsByAuthorId } from '../services/comments.js';
 
 function UserProfilePage() {
     const { id } = useParams();
@@ -14,6 +15,7 @@ function UserProfilePage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [posts, setPosts] = useState([]);
+    const [comments, setComments] = useState([]);
 
     useEffect(() => {
         const loadProfile = async () => {
@@ -30,6 +32,10 @@ function UserProfilePage() {
                 });
 
                 setPosts(userPosts);
+
+                const userComments = await getCommentsByAuthorId(id);
+                setComments(userComments);
+                console.log(userComments)
             } catch (error) {
                 setError(error.message);
             } finally {
@@ -140,6 +146,47 @@ function UserProfilePage() {
                                         color="fg.muted"
                                     >
                                         {formatDate(post.created_at)}
+                                    </Text>
+                                </Box>
+                            ))}
+                        </Stack>
+                    )}
+
+                    <Heading size="md" mt={10} mb={4}>
+                        Comments
+                    </Heading>
+
+                    {comments.length === 0 ? (
+                        <Text color="fg.muted">
+                            This user has not created any comments yet.
+                        </Text>
+                    ) : (
+                        <Stack gap={4}>
+                            {comments.map((comment) => (
+                                <Box
+                                    key={comment.id}
+                                    borderWidth="1px"
+                                    borderRadius="md"
+                                    p={4}
+                                >
+                                    <Text>
+                                        {comment.content}
+                                    </Text>
+
+                                    <Text
+                                        mt={2}
+                                        fontSize="sm"
+                                        color="fg.muted"
+                                    >
+                                        on {comment.posts.title}
+                                    </Text>
+
+                                    <Text
+                                        mt={1}
+                                        fontSize="sm"
+                                        color="fg.muted"
+                                    >
+                                        {formatDate(comment.created_at)}
                                     </Text>
                                 </Box>
                             ))}
