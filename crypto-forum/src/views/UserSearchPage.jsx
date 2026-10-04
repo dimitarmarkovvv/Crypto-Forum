@@ -3,12 +3,15 @@ import { Box, Button, Container, Heading, HStack, Input, Spinner, Stack, Text } 
 import { toaster } from '../components/ui/toast-store.js';
 import { searchUsers, getAvatarUrl, promoteUser } from '../services/profiles.js';
 import { useAuth } from '../hooks/useAuth.js';
+import { useNavigate } from 'react-router-dom';
 
 function UserSearchPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
     const { profile } = useAuth();
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (!searchTerm.trim()) {
@@ -62,7 +65,14 @@ function UserSearchPage() {
                                 <img src={getAvatarUrl(foundUser.avatar_url)} alt="avatar" width={40} height={40} style={{ borderRadius: '50%' }} />
                             )}
                             <Box>
-                                <Text fontWeight="bold">{foundUser.username}</Text>
+                                <Text
+                                    fontWeight="bold"
+                                    cursor="pointer"
+                                    _hover={{ textDecoration: 'underline' }}
+                                    onClick={() => navigate(`/users/${foundUser.id}`)}
+                                >
+                                    {foundUser.username}
+                                </Text>
                                 <Text fontSize="sm" color="fg.muted">
                                     {foundUser.first_name} {foundUser.last_name} — {foundUser.email}
                                 </Text>
