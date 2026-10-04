@@ -9,6 +9,7 @@ import EditPostPage from './views/EditPostPage.jsx';
 import PostDetailsPage from './views/PostDetailsPage.jsx';
 import EditProfilePage from './views/EditProfilePage.jsx';
 import UserSearchPage from './views/UserSearchPage.jsx';
+import UserProfilePage from './views/UserProfilePage.jsx';
 
 function App() {
   return (
@@ -23,8 +24,11 @@ function App() {
           <Route path='/posts/create' element={<CreatePostPage />} />
           <Route path='/posts/:id/edit' element={<EditPostPage />} />
           <Route path='/posts/:id' element={<PostDetailsPage />} />
+
           <Route path='/profile/edit' element={<EditProfilePage />} />
+
           <Route path='/users/search' element={<UserSearchPage />} />
+          <Route path='/users/:id' element={<UserProfilePage />} />
         </Route>
       </Routes>
     </BrowserRouter>
