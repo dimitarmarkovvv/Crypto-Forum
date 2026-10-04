@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { deletePost, getPostById } from "../services/posts";
 import { useEffect, useState } from "react";
-import { Button, Center, Container, Heading, Spinner, HStack, Text, Stack, Textarea, Dialog, Portal, NativeSelect } from '@chakra-ui/react';
+import { Button, Center, Container, Heading, Spinner, HStack, Text, Stack, Textarea, NativeSelect } from '@chakra-ui/react';
 import { toaster } from '../components/ui/toast-store.js';
 import { formatDate } from "../utils/formatDate.js";
 import { useAuth } from "../hooks/useAuth.js";
@@ -10,6 +10,7 @@ import { getCommentsByPostId, createComment, updateComment, deleteComment } from
 import { castVote, getPostVotes, removeVote, castCommentVote, deleteCommentVote, getCommentVotes } from "../services/votes.js";
 import { buildCommentTree } from '../utils/buildCommentTree.js';
 import Comment from '../components/ui/comments/Comment.jsx'
+import DeleteCommentDialog from '../components/ui/comments/DeleteCommentDialog.jsx';
 
 function PostDetailsPage() {
     const navigate = useNavigate();
@@ -307,51 +308,11 @@ function PostDetailsPage() {
                 </Button>
             </form>
 
-            <Dialog.Root
-                open={commentToDelete !== null}
-                onOpenChange={(details) => {
-                    if (!details.open) {
-                        setCommentToDelete(null);
-                    }
-                }}
-            >
-                <Portal>
-                    <Dialog.Backdrop />
-
-                    <Dialog.Positioner>
-                        <Dialog.Content>
-                            <Dialog.Header>
-                                <Dialog.Title>
-                                    Delete comment?
-                                </Dialog.Title>
-                            </Dialog.Header>
-
-                            <Dialog.Body>
-                                <Text>
-                                    Are you sure you want to delete this comment?
-                                    This action cannot be undone.
-                                </Text>
-                            </Dialog.Body>
-
-                            <Dialog.Footer>
-                                <Button
-                                    variant="outline"
-                                    onClick={() => setCommentToDelete(null)}
-                                >
-                                    Cancel
-                                </Button>
-
-                                <Button
-                                    colorPalette="red"
-                                    onClick={handleDeleteComment}
-                                >
-                                    Delete
-                                </Button>
-                            </Dialog.Footer>
-                        </Dialog.Content>
-                    </Dialog.Positioner>
-                </Portal>
-            </Dialog.Root>
+            <DeleteCommentDialog
+                commentToDelete={commentToDelete}
+                setCommentToDelete={setCommentToDelete}
+                handleDeleteComment={handleDeleteComment}
+            />
         </Container>
     );
 };
