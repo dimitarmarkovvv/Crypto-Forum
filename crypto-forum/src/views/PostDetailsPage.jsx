@@ -6,11 +6,12 @@ import { Button, Center, Container, Heading, Spinner, HStack, Text, Stack, Texta
 import { toaster } from '../components/ui/toast-store.js';
 import { formatDate } from "../utils/formatDate.js";
 import { useAuth } from "../hooks/useAuth.js";
-import { getCommentsByPostId, createComment, updateComment, deleteComment } from "../services/comments.js";
+import { getCommentsByPostId } from "../services/comments.js";
 import { castVote, getPostVotes, removeVote, castCommentVote, deleteCommentVote, getCommentVotes } from "../services/votes.js";
 import { buildCommentTree } from '../utils/buildCommentTree.js';
 import Comment from '../components/ui/comments/Comment.jsx'
 import DeleteCommentDialog from '../components/ui/comments/DeleteCommentDialog.jsx';
+import { useComments } from '../hooks/useComments.js';
 
 function PostDetailsPage() {
     const navigate = useNavigate();
@@ -18,46 +19,45 @@ function PostDetailsPage() {
     const { id } = useParams();
     const [pageLoading, setPageLoading] = useState(true);
     const { user, profile } = useAuth();
-    const [comments, setComments] = useState([]);
-    const [newComments, setNewComments] = useState('');
     const [score, setScore] = useState(0);
     const [userVote, setUserVote] = useState(0);
-    const [replyingTo, setReplyingTo] = useState(null);
-    const [replyContent, setReplyContent] = useState('');
-    const [editingCommentId, setEditingCommentId] = useState(null);
-    const [editCommentContent, setEditCommentContent] = useState('');
-    const [commentToDelete, setCommentToDelete] = useState(null);
     const [sort, setSort] = useState('newest');
     const [commentVotes, setCommentVotes] = useState({});
 
+    const {
+        comments,
+        setComments,
+
+        newComments,
+        setNewComments,
+
+        replyingTo,
+        setReplyingTo,
+
+        replyContent,
+        setReplyContent,
+
+        editingCommentId,
+        setEditingCommentId,
+
+        editCommentContent,
+        setEditCommentContent,
+
+        commentToDelete,
+        setCommentToDelete,
+
+        handleComment,
+        handleEditComment,
+        handleDeleteComment,
+    } = useComments({
+        postId: id,
+        user,
+        profile,
+        sort,
+    });
+
     const commentTree = buildCommentTree(comments);
 
-    const handleComment = async (parentCommentId = null) => {
-        const content = parentCommentId ? replyContent : newComments;
-        if (profile?.is_blocked) {
-            toaster.create({ title: 'Your account has been blocked.', type: 'error' });
-            return;
-        };
-        try {
-            const comment = await createComment(
-                content,
-                id,
-                user.id,
-                parentCommentId
-            );
-
-            setComments((prev) => [...prev, comment])
-
-            if (parentCommentId) {
-                setReplyContent('')
-                setReplyingTo(null);
-            } else {
-                setNewComments('');
-            }
-        } catch (error) {
-            toaster.create({ title: error.message, type: 'error' });
-        };
-    };
 
     const handleDelete = async () => {
         try {
@@ -109,53 +109,6 @@ function PostDetailsPage() {
         }
     }
 
-    const handleEditComment = async (commentId) => {
-        try {
-            const updatedComment = await updateComment(
-                commentId,
-                editCommentContent
-            );
-
-            setComments((prev) =>
-                prev.map((comment) =>
-                    comment.id === commentId
-                        ? updatedComment
-                        : comment
-                )
-            );
-
-            setEditingCommentId(null);
-            setEditCommentContent('');
-        } catch (error) {
-            console.error(error);
-
-            toaster.create({
-                title: error.message,
-                type: 'error',
-            });
-        }
-    };
-
-    const handleDeleteComment = async () => {
-        try {
-            await deleteComment(commentToDelete);
-
-            const updatedComments = await getCommentsByPostId(id);
-            setComments(updatedComments);
-
-            setCommentToDelete(null)
-
-            toaster.create({
-                title: 'Comment deleted',
-                type: 'success',
-            });
-        } catch (error) {
-            toaster.create({
-                title: error.message,
-                type: 'error',
-            });
-        }
-    }
 
     useEffect(() => {
         const loadPost = async () => {
@@ -186,7 +139,7 @@ function PostDetailsPage() {
         };
 
         loadPost();
-    }, [id, user.id, sort]);
+    }, [id, user.id, sort, setComments]);
 
     if (pageLoading) {
         return (
