@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams} from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import {
     Center, Container, Heading, Image, Spinner, Stack, Text,
 } from '@chakra-ui/react';
@@ -74,6 +74,13 @@ function UserProfilePage() {
                         Location: {userProfile.location}
                     </Text>
                 )}
+
+                {userProfile.gender && (
+                    <Text color="fg.muted">
+                        Gender: {userProfile.gender}
+                    </Text>
+                )}
+
 
                 {userProfile.signature && (
                     <Text fontStyle="italic">
