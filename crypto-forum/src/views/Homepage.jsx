@@ -54,7 +54,6 @@ function HomePage() {
                     <Text>Logged in as: {user.email}</Text>
                     <Button size="sm" onClick={() => navigate('/users/search')}>Search Users</Button>
                     <Button size="sm" onClick={handleLogout}>Logout</Button>
-                    <Button size="sm" onClick={() => navigate('/profile/edit')}>Edit</Button>
                     <Avatar.Root
                         w="40px"
                         h="40px"
