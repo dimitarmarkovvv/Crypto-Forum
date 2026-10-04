@@ -71,6 +71,11 @@ export const promoteUser = async (targetUserId, newRole) => {
 };
 
 export const getUserProfileById = async (userId) => {
+
+  if(!isValidUuid(userId)){
+    return null;
+  }
+  
   const {data, error } = await supabase
   .from('profiles')
   .select(`id,
@@ -85,11 +90,15 @@ export const getUserProfileById = async (userId) => {
     created_at
     `)
     .eq('id', userId)
-    .single();
+    .maybeSingle();
 
     if(error) {
       throw error;
     }
 
     return data
+}
+
+const isValidUuid = (value) => {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-    Center, Container, Heading, Avatar, Spinner, Stack, Text, Box, Grid
+    Center, Container, Heading, Avatar, Spinner, Stack, Text, Box, Grid, Button
 } from '@chakra-ui/react';
 import { getAvatarUrl, getUserProfileById } from '../services/profiles';
 import { getPosts } from '../services/posts.js';
@@ -25,6 +25,10 @@ function UserProfilePage() {
                 setError('');
 
                 const profile = await getUserProfileById(id);
+                if (!profile) {
+                    setUserProfile(null);
+                    return;
+                }
                 setUserProfile(profile)
 
                 const userPosts = await getPosts({
@@ -62,6 +66,29 @@ function UserProfilePage() {
                     Failed to load profile: {error}
                 </Text>
             </Container>
+        )
+    }
+
+    if (!userProfile) {
+        return (
+            <Center minH="70vh">
+                <Stack align="center" gap={6}>
+                    <Heading size="2xl">
+                        User not found.
+                    </Heading>
+
+                    <Text color="fg.muted" fontSize="lg">
+                        The user you are looking for does not exist.
+                    </Text> 
+
+                    <Button
+                        size="lg"
+                        onClick={() => navigate('/')}
+                    >
+                        Go to Home
+                    </Button>
+                </Stack>
+            </Center>
         )
     }
 
