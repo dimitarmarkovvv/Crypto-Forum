@@ -99,6 +99,21 @@ export const getUserProfileById = async (userId) => {
     return data
 }
 
+export const adminSearchUsers = async (searchTerm = '') => {
+  const {data, error } = await supabase.rpc(
+    'admin_search_users',
+    {
+      search_term: searchTerm,
+    }
+  )
+
+  if(error) {
+    throw error;
+  }
+
+  return data ?? [];
+}
+
 const isValidUuid = (value) => {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 }
