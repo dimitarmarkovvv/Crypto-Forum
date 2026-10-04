@@ -10,6 +10,8 @@ import PostDetailsPage from './views/PostDetailsPage.jsx';
 import EditProfilePage from './views/EditProfilePage.jsx';
 import UserSearchPage from './views/UserSearchPage.jsx';
 import UserProfilePage from './views/UserProfilePage.jsx';
+import { AdminRoute } from './routes/AdminRoute.jsx';
+import AdminDashboardPage from './views/AdminDashboardPage.jsx';
 
 function App() {
   return (
@@ -29,6 +31,10 @@ function App() {
 
           <Route path='/users/search' element={<UserSearchPage />} />
           <Route path='/users/:id' element={<UserProfilePage />} />
+        </Route>
+
+        <Route element={<AdminRoute />}>
+          <Route path="/admin"element={<AdminDashboardPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
