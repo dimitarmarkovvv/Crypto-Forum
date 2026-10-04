@@ -7,11 +7,12 @@ import { toaster } from '../components/ui/toast-store.js';
 import { formatDate } from "../utils/formatDate.js";
 import { useAuth } from "../hooks/useAuth.js";
 import { getCommentsByPostId } from "../services/comments.js";
-import { castVote, getPostVotes, removeVote, castCommentVote, deleteCommentVote, getCommentVotes } from "../services/votes.js";
+import { castVote, getPostVotes, removeVote,} from "../services/votes.js";
 import { buildCommentTree } from '../utils/buildCommentTree.js';
 import Comment from '../components/ui/comments/Comment.jsx'
 import DeleteCommentDialog from '../components/ui/comments/DeleteCommentDialog.jsx';
 import { useComments } from '../hooks/useComments.js';
+import { useCommentVotes } from '../hooks/useCommentVotes.js';
 
 function PostDetailsPage() {
     const navigate = useNavigate();
@@ -22,7 +23,6 @@ function PostDetailsPage() {
     const [score, setScore] = useState(0);
     const [userVote, setUserVote] = useState(0);
     const [sort, setSort] = useState('newest');
-    const [commentVotes, setCommentVotes] = useState({});
 
     const {
         comments,
@@ -56,6 +56,14 @@ function PostDetailsPage() {
         sort,
     });
 
+    const {
+        commentVotes,
+        handleCommentVote,
+    } = useCommentVotes({
+        comments,
+        userId: user.id,
+    });
+
     const commentTree = buildCommentTree(comments);
 
 
@@ -85,31 +93,6 @@ function PostDetailsPage() {
         }
     };
 
-    const handleCommentVote = async (commentId, value) => {
-        try {
-            const currentVote = commentVotes[commentId]?.userVote ?? 0;
-
-            if (currentVote === value) {
-                await deleteCommentVote(commentId, user.id);
-            } else {
-                await castCommentVote(commentId, user.id, value);
-            }
-
-            const fetchedCommentVotes = await getCommentVotes(
-                comments.map((comment) => comment.id),
-                user.id
-            );
-
-            setCommentVotes(fetchedCommentVotes)
-        } catch (error) {
-            toaster.create({
-                title: error.message,
-                type: 'error',
-            });
-        }
-    }
-
-
     useEffect(() => {
         const loadPost = async () => {
             setPageLoading(true);
@@ -119,14 +102,6 @@ function PostDetailsPage() {
                 setPost(post);
                 const commentData = await getCommentsByPostId(id, sort);
                 setComments(commentData);
-
-                const commentIds = commentData.map((comment) => comment.id);
-                const fetchedCommentVotes = await getCommentVotes(
-                    commentIds,
-                    user.id
-                );
-
-                setCommentVotes(fetchedCommentVotes)
 
                 const { score: fetchedScore, userVote: fetchedUserVote } = await getPostVotes(id, user.id);
                 setScore(fetchedScore);
