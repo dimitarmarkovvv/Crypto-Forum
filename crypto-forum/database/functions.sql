@@ -98,13 +98,12 @@ to anon, authenticated;
 -- Search users
 -- Returns profiles matching username, email, or first+last name
 
-create or replace function public.search_users(search_term text)
+create function public.search_users(search_term text)
 returns table (
     id uuid,
     username text,
     first_name text,
     last_name text,
-    email text,
     avatar_url text
 )
 language sql
@@ -116,15 +115,22 @@ as $$
         p.username,
         p.first_name,
         p.last_name,
-        p.email,
         p.avatar_url
     from public.profiles p
     where
         p.username ilike '%' || search_term || '%'
-        or p.email ilike '%' || search_term || '%'
-        or (p.first_name || ' ' || p.last_name) ilike '%' || search_term || '%'
+        or (p.first_name || ' ' || p.last_name)
+            ilike '%' || search_term || '%'
     limit 20;
 $$;
+
+revoke all
+on function public.search_users(text)
+from public;
+
+grant execute
+on function public.search_users(text)
+to authenticated;
 
 revoke all on function public.search_users(text) from public;
 
@@ -158,3 +164,58 @@ revoke all on function public.promote_user(uuid, text) from public;
 
 grant execute on function public.promote_user(uuid, text)
 to authenticated;
+
+create or replace function public.admin_search_users(search_term text default '')
+returns table (
+    id uuid,
+    username text,
+    first_name text,
+    last_name text,
+    email text,
+    avatar_url text,
+    role text,
+    is_blocked, boolean
+)
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+    if not exists (
+        select 1
+        from public.profiles
+        where profiles.id = auth.uid()
+        and profiles.role = 'admin'
+    ) then 
+       raise exception 'Only admins can search users.'
+       end if;
+       
+       return query
+       select
+          p.id,
+          p.username,
+          p.first_name,
+          p.email,
+          p.avatar_url,
+          p.role,
+          p.is_blocked
+        from public.profiles p 
+        where
+          trim(search_term) = ''
+          or p.username ilike '%' || trim(search_term) || '%'
+          or p.email ilike '%' || trim(search_term) || '%'
+          or (p.first_name || ' ' || p.last_name)
+              ilike '%' || trim(search_term) || '%'
+        order by p.username
+        limit 50;
+end
+$$;
+
+revoke all
+on function public.admin_search_users(text)
+from public;
+
+grant execute
+on function public.admin_search_users(text)
+to authenticated;
+
