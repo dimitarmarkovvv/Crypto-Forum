@@ -219,3 +219,50 @@ grant execute
 on function public.admin_search_users(text)
 to authenticated;
 
+-- Block / unblock user
+-- Only admins can change another user's blocked status
+
+create or replace function public.set_user_blocked(
+    target_user_id uuid,
+    blocked boolean
+)
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+    if not exists (
+        select 1
+        from public.profiles
+        where id = auth.uid()
+          and role = 'admin'
+    ) then
+        raise exception 'Only admins can block or unblock users.';
+    end if;
+
+    if target_user_id = auth.uid() then
+        raise exception 'You cannot block your own account.';
+    end if;
+
+    if not exists (
+        select 1
+        from public.profiles
+        where id = target_user_id
+    ) then
+        raise exception 'User not found.';
+    end if;
+
+    update public.profiles
+    set is_blocked = blocked
+    where id = target_user_id;
+end;
+$$;
+
+revoke all
+on function public.set_user_blocked(uuid, boolean)
+from public;
+
+grant execute
+on function public.set_user_blocked(uuid, boolean)
+to authenticated;
