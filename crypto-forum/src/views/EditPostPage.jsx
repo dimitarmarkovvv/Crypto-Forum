@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { getPostById, updatePost } from "../services/posts";
-import { useEffect, useState} from "react";
-import { Button, Center, Container, Field, Heading, Input, Spinner, Stack, Textarea } from '@chakra-ui/react';
+import { useEffect, useState } from "react";
+import { Button, Center, Container, Field, Heading, Input, Spinner, Stack, Textarea, Box, Text } from '@chakra-ui/react';
 import { toaster } from '../components/ui/toast-store.js';
 import { useAuth } from "../hooks/useAuth.js";
 
@@ -13,7 +13,7 @@ function EditPostPage() {
     const [loading, setLoading] = useState(false);
     const { id } = useParams();
     const [pageLoading, setPageLoading] = useState(true);
-    const { user } = useAuth();
+    const { user, profile } = useAuth();
 
     useEffect(() => {
         const loadPost = async () => {
@@ -29,7 +29,7 @@ function EditPostPage() {
                         type: 'error',
                     });
 
-                    navigate('/posts', {replace: true})
+                    navigate('/posts', { replace: true })
                     return;
                 }
 
@@ -43,7 +43,7 @@ function EditPostPage() {
         };
 
         loadPost();
-    }, [id, user.id, navigate]);
+    }, [id, user.id, profile?.is_blocked, navigate]);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -85,6 +85,34 @@ function EditPostPage() {
             <Center py={20}>
                 <Spinner size="lg" />
             </Center>
+        );
+    }
+
+    if (profile?.is_blocked) {
+        return (
+            <Container maxW="2xl" py={10}>
+                <Box
+                    p={4}
+                    borderWidth="1px"
+                    borderRadius="md"
+                    bg="bg.subtle"
+                >
+                    <Text fontWeight="medium">
+                        Editing disabled
+                    </Text>
+
+                    <Text mt={1} color="fg.muted">
+                        You cannot edit posts while your account is blocked.
+                    </Text>
+                </Box>
+
+                <Button
+                    mt={4}
+                    onClick={() => navigate('/posts')}
+                >
+                    Back to Posts
+                </Button>
+            </Container>
         );
     }
 

@@ -19,7 +19,7 @@ import {
 import { toaster } from '../components/ui/toast-store.js';
 
 function PostsPage() {
-    const { user } = useAuth();
+    const { user, profile } = useAuth();
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
@@ -84,7 +84,16 @@ function PostsPage() {
 
     return (
         <Container maxW="3xl" py={10}>
-            <Heading mb={6}>Posts</Heading>
+            <HStack justify="space-between" mb={6}>
+                <Heading>Posts</Heading>
+
+                <Button
+                    onClick={() => navigate('/posts/create')}
+                    disabled={profile?.is_blocked}
+                >
+                    Create Post
+                </Button>
+            </HStack>
 
             <HStack mb={6} gap={4} wrap="wrap">
                 <Input
@@ -144,10 +153,10 @@ function PostsPage() {
                             <Text mt={2} color="fg.muted">
                                 by{' '}
                                 <Text
-                                as="span"
-                                cursor="pointer"
-                                _hover={{textDecoration: 'underline'}}
-                                onClick={() => navigate(`/users/${post.author_id}`)}
+                                    as="span"
+                                    cursor="pointer"
+                                    _hover={{ textDecoration: 'underline' }}
+                                    onClick={() => navigate(`/users/${post.author_id}`)}
                                 >
                                     {post.profiles.username}
                                 </Text>
@@ -160,7 +169,7 @@ function PostsPage() {
 
                             {post.author_id === user.id && (
                                 <HStack mt={4}>
-                                    <Button size="sm" onClick={() => navigate(`/posts/${post.id}/edit`)}>
+                                    <Button size="sm" disabled={profile.is_blocked} onClick={() => navigate(`/posts/${post.id}/edit`)}>
                                         Edit
                                     </Button>
 

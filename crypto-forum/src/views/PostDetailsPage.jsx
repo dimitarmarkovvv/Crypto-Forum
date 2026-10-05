@@ -2,12 +2,12 @@ import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { deletePost, getPostById } from "../services/posts";
 import { useEffect, useState } from "react";
-import { Button, Center, Container, Heading, Spinner, HStack, Text, Stack, Textarea, NativeSelect } from '@chakra-ui/react';
+import { Button, Center, Container, Heading, Spinner, HStack, Text, Stack, Textarea, Box, NativeSelect } from '@chakra-ui/react';
 import { toaster } from '../components/ui/toast-store.js';
 import { formatDate } from "../utils/formatDate.js";
 import { useAuth } from "../hooks/useAuth.js";
 import { getCommentsByPostId } from "../services/comments.js";
-import { castVote, getPostVotes, removeVote,} from "../services/votes.js";
+import { castVote, getPostVotes, removeVote, } from "../services/votes.js";
 import { buildCommentTree } from '../utils/buildCommentTree.js';
 import Comment from '../components/ui/comments/Comment.jsx'
 import DeleteCommentDialog from '../components/ui/comments/DeleteCommentDialog.jsx';
@@ -164,7 +164,7 @@ function PostDetailsPage() {
 
             {post.author_id === user.id && (
                 <HStack>
-                    <Button size="sm" onClick={() => navigate(`/posts/${id}/edit`)}>
+                    <Button size="sm" disabled={profile.is_blocked} onClick={() => navigate(`/posts/${id}/edit`)}>
                         Edit
                     </Button>
 
@@ -196,6 +196,7 @@ function PostDetailsPage() {
                             key={comment.id}
                             comment={comment}
                             userId={user.id}
+                            isBlocked={profile?.is_blocked}
                             commentVotes={commentVotes}
 
                             editingCommentId={editingCommentId}
@@ -217,24 +218,42 @@ function PostDetailsPage() {
                 )}
             </Stack>
 
-            <form
-                onSubmit={(event) => {
-                    event.preventDefault();
-                    handleComment();
-                }}
-            >
-                <Textarea
+            {profile?.is_blocked ? (
+                <Box
                     mt={4}
-                    placeholder="Write a comment..."
-                    value={newComments}
-                    onChange={(event) => setNewComments(event.target.value)}
-                    required
-                />
+                    p={3}
+                    borderWidth="1px"
+                    borderRadius="md"
+                    bg="bg.subtle"
+                >
+                    <Text fontWeight="medium" fontSize="sm">
+                        Commenting disabled
+                    </Text>
 
-                <Button mt={2} type="submit">
-                    Post Comment
-                </Button>
-            </form>
+                    <Text fontSize="sm" color="fg.muted" mt={1}>
+                        You cannot post comments or replies while your account is blocked.
+                    </Text>
+                </Box>
+            ) : (
+                <form
+                    onSubmit={(event) => {
+                        event.preventDefault();
+                        handleComment();
+                    }}
+                >
+                    <Textarea
+                        mt={4}
+                        placeholder="Write a comment..."
+                        value={newComments}
+                        onChange={(event) => setNewComments(event.target.value)}
+                        required
+                    />
+
+                    <Button mt={2} type="submit">
+                        Post Comment
+                    </Button>
+                </form>
+            )}
 
             <DeleteCommentDialog
                 commentToDelete={commentToDelete}

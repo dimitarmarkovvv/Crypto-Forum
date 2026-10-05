@@ -4,6 +4,7 @@ import {
     Avatar,
     Badge,
     Box,
+    Button,
     Container,
     Heading,
     Input,
@@ -16,9 +17,11 @@ import {
 import {
     adminSearchUsers,
     getAvatarUrl,
+    setUserBlocked,
 } from '../services/profiles.js';
 import { getForumStats } from '../services/homepage.js';
 import { toaster } from '../components/ui/toast-store.js';
+import BlockUserDialog from '../components/ui/admin/BlockUserDialog.jsx';
 
 
 function AdminDashboardPage() {
@@ -27,6 +30,7 @@ function AdminDashboardPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [users, setUsers] = useState([]);
     const [loadingUsers, setloadingUsers] = useState(true);
+    const [userToBlock, setUserToBlock] = useState(null);
 
     const [stats, setStats] = useState({
         totalUsers: 0,
@@ -70,6 +74,52 @@ function AdminDashboardPage() {
 
         loadUsers()
     }, [searchTerm])
+
+    const handleBlockToggle = async (userId, blocked) => {
+        try {
+            await setUserBlocked(userId, blocked);
+
+            setUsers((prevUsers) =>
+                prevUsers.map((user) =>
+                    user.id === userId
+                        ? { ...user, is_blocked: blocked }
+                        : user
+                )
+            );
+
+            toaster.create({
+                title: blocked
+                    ? 'User blocked'
+                    : 'User unblocked',
+                type: 'success',
+            });
+
+            return true;
+        } catch (error) {
+            toaster.create({
+                title: error.message,
+                type: 'error',
+            });
+
+            return false;
+        }
+    };
+
+    const handleConfirmBlock = async () => {
+        if (!userToBlock) {
+            return;
+        }
+
+        const success = await handleBlockToggle(
+            userToBlock.id,
+            true
+        );
+
+        if (success) {
+            setUserToBlock(null);
+        }
+
+    };
 
     return (
         <Container maxW="7xl" py={10}>
@@ -195,6 +245,9 @@ function AdminDashboardPage() {
                                         <Table.ColumnHeader>
                                             Status
                                         </Table.ColumnHeader>
+                                        <Table.ColumnHeader>
+                                            Actions
+                                        </Table.ColumnHeader>
                                     </Table.Row>
                                 </Table.Header>
 
@@ -283,6 +336,40 @@ function AdminDashboardPage() {
                                                         : 'Active'}
                                                 </Badge>
                                             </Table.Cell>
+
+                                            <Table.Cell>
+                                                {foundUser.role === 'admin' ? (
+                                                    <Badge
+                                                        variant="subtle"
+                                                        colorPalette="gray"
+                                                    >
+                                                        Protected
+                                                    </Badge>
+                                                ) : foundUser.is_blocked ? (
+                                                    <Button
+                                                        size="sm"
+                                                        colorPalette="green"
+                                                        onClick={() =>
+                                                            handleBlockToggle(
+                                                                foundUser.id,
+                                                                false
+                                                            )
+                                                        }
+                                                    >
+                                                        Unblock
+                                                    </Button>
+                                                ) : (
+                                                    <Button
+                                                        size="sm"
+                                                        colorPalette="red"
+                                                        onClick={() =>
+                                                            setUserToBlock(foundUser)
+                                                        }
+                                                    >
+                                                        Block
+                                                    </Button>
+                                                )}
+                                            </Table.Cell>
                                         </Table.Row>
                                     ))}
                                 </Table.Body>
@@ -290,6 +377,12 @@ function AdminDashboardPage() {
                         </Box>
                     )}
                 </Box>
+
+                <BlockUserDialog
+                    userToBlock={userToBlock}
+                    setUserToBlock={setUserToBlock}
+                    handleConfirmBlock={handleConfirmBlock}
+                />
 
                 <Box>
                     <Heading size="lg" mb={1}>

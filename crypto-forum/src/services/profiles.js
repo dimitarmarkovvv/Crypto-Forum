@@ -114,6 +114,22 @@ export const adminSearchUsers = async (searchTerm = '') => {
   return data ?? [];
 }
 
+export const setUserBlocked = async (targetUserId, blocked) => {
+  const {data, error} = await supabase.rpc(
+    'set_user_blocked',
+    {
+      target_user_id: targetUserId,
+      blocked,
+    }
+  );
+
+  if(error) {
+    throw error
+  }
+
+  return data ?? null;
+}
+
 const isValidUuid = (value) => {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 }

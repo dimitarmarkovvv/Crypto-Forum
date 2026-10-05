@@ -12,10 +12,49 @@ import UserSearchPage from './views/UserSearchPage.jsx';
 import UserProfilePage from './views/UserProfilePage.jsx';
 import { AdminRoute } from './routes/AdminRoute.jsx';
 import AdminDashboardPage from './views/AdminDashboardPage.jsx';
+import { useAuth } from './hooks/useAuth.js';
+import BlockedAccountDialog from './components/ui/BlockedAccountDialog.jsx';
+import { useState } from 'react';
+import BlockedAccountBanner from './components/ui/BlockedUserBanner.jsx';
 
 function App() {
+  const { user, profile } = useAuth();
+
+  const [, setBlockedNoticeVersion] = useState(0);
+
+  const blockedNoticeKey = user
+    ? `blocked-notice-${user.id}`
+    : null;
+
+  const blockedNoticeAcknowledged =
+    blockedNoticeKey &&
+    sessionStorage.getItem(blockedNoticeKey) === 'true';
+
+  const blockedDialogOpen =
+    Boolean(user && profile?.is_blocked) &&
+    !blockedNoticeAcknowledged;
+
+  const handleBlockedNoticeAcknowledge = () => {
+    if (!blockedNoticeKey) return;
+
+    sessionStorage.setItem(
+      blockedNoticeKey,
+      'true'
+    );
+
+    setBlockedNoticeVersion((version) => version + 1);
+  };
   return (
     <BrowserRouter>
+      {user && profile?.is_blocked && (
+        <BlockedAccountBanner />
+      )}
+
+      <BlockedAccountDialog
+        open={blockedDialogOpen}
+        onAcknowledge={handleBlockedNoticeAcknowledge}
+      />
+
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
@@ -34,7 +73,7 @@ function App() {
         </Route>
 
         <Route element={<AdminRoute />}>
-          <Route path="/admin"element={<AdminDashboardPage />} />
+          <Route path="/admin" element={<AdminDashboardPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
