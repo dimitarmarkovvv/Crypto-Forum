@@ -174,7 +174,7 @@ returns table (
     email text,
     avatar_url text,
     role text,
-    is_blocked, boolean
+    is_blocked boolean
 )
 language plpgsql
 security definer
