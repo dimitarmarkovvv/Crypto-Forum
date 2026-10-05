@@ -245,6 +245,15 @@ begin
         raise exception 'You cannot block your own account.';
     end if;
 
+    if exists (
+       select 1
+       from public.profiles
+       where id = target_user_id
+         and role = 'admin'
+    ) then
+        raise exception 'Admins cannot block other admins.';
+    end if;
+
     if not exists (
         select 1
         from public.profiles
