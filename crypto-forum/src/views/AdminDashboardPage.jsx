@@ -4,6 +4,7 @@ import {
     Avatar,
     Badge,
     Box,
+    Button,
     Container,
     Heading,
     Input,
@@ -16,6 +17,7 @@ import {
 import {
     adminSearchUsers,
     getAvatarUrl,
+    setUserBlocked,
 } from '../services/profiles.js';
 import { getForumStats } from '../services/homepage.js';
 import { toaster } from '../components/ui/toast-store.js';
@@ -70,6 +72,32 @@ function AdminDashboardPage() {
 
         loadUsers()
     }, [searchTerm])
+
+    const handleBlockToggle = async (userId, blocked) => {
+        try {
+            await setUserBlocked(userId, blocked);
+
+            setUsers((prevUsers) =>
+                prevUsers.map((user) =>
+                    user.id === userId
+                        ? { ...user, is_blocked: blocked }
+                        : user
+                )
+            );
+
+            toaster.create({
+                title: blocked
+                    ? 'User blocked'
+                    : 'User unblocked',
+                type: 'success',
+            });
+        } catch (error) {
+            toaster.create({
+                title: error.message,
+                type: 'error',
+            });
+        }
+    };
 
     return (
         <Container maxW="7xl" py={10}>
@@ -195,6 +223,9 @@ function AdminDashboardPage() {
                                         <Table.ColumnHeader>
                                             Status
                                         </Table.ColumnHeader>
+                                        <Table.ColumnHeader>
+                                            Actions
+                                        </Table.ColumnHeader>
                                     </Table.Row>
                                 </Table.Header>
 
@@ -282,6 +313,22 @@ function AdminDashboardPage() {
                                                         ? 'Blocked'
                                                         : 'Active'}
                                                 </Badge>
+                                            </Table.Cell>
+
+                                            <Table.Cell>
+                                                <Button
+                                                    size="sm"
+                                                    colorPalette={
+                                                        foundUser.is_blocked
+                                                            ? 'green'
+                                                            : 'red'
+                                                    }
+                                                    onClick={() => handleBlockToggle(foundUser.id, !foundUser.is_blocked)}
+                                                >
+
+                                                    {foundUser.is_blocked ? 'Unblock' : 'Block'}
+
+                                                </Button>
                                             </Table.Cell>
                                         </Table.Row>
                                     ))}
