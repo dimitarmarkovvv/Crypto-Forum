@@ -316,19 +316,33 @@ function AdminDashboardPage() {
                                             </Table.Cell>
 
                                             <Table.Cell>
-                                                <Button
-                                                    size="sm"
-                                                    colorPalette={
-                                                        foundUser.is_blocked
-                                                            ? 'green'
-                                                            : 'red'
-                                                    }
-                                                    onClick={() => handleBlockToggle(foundUser.id, !foundUser.is_blocked)}
-                                                >
-
-                                                    {foundUser.is_blocked ? 'Unblock' : 'Block'}
-
-                                                </Button>
+                                                {foundUser.role === 'admin' ? (
+                                                    <Badge
+                                                        variant="subtle"
+                                                        colorPalette="gray"
+                                                    >
+                                                        Protected
+                                                    </Badge>
+                                                ) : (
+                                                    <Button
+                                                        size="sm"
+                                                        colorPalette={
+                                                            foundUser.is_blocked
+                                                                ? 'green'
+                                                                : 'red'
+                                                        }
+                                                        onClick={() =>
+                                                            handleBlockToggle(
+                                                                foundUser.id,
+                                                                !foundUser.is_blocked
+                                                            )
+                                                        }
+                                                    >
+                                                        {foundUser.is_blocked
+                                                            ? 'Unblock'
+                                                            : 'Block'}
+                                                    </Button>
+                                                )}
                                             </Table.Cell>
                                         </Table.Row>
                                     ))}
