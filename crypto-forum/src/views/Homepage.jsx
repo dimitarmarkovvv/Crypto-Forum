@@ -14,9 +14,9 @@ function HomePage() {
     const [comments, setComments] = useState([]);
     const navigate = useNavigate();
 
-    const handleLogout = async () => {
+    const handleLogout = async (userId) => {
         try {
-            await logoutUser();
+            await logoutUser(userId);
             navigate('/login')
         } catch (error) {
             console.error(error.message);
@@ -53,7 +53,7 @@ function HomePage() {
                 <Stack direction="row" align="center" gap={4} mt={4}>
                     <Text>Logged in as: {user.email}</Text>
                     <Button size="sm" onClick={() => navigate('/users/search')}>Search Users</Button>
-                    <Button size="sm" onClick={handleLogout}>Logout</Button>
+                    <Button size="sm" onClick={() => handleLogout(user.id)}>Logout</Button>
                     <Avatar.Root
                         w="40px"
                         h="40px"
