@@ -15,6 +15,7 @@ import AdminDashboardPage from './views/AdminDashboardPage.jsx';
 import { useAuth } from './hooks/useAuth.js';
 import BlockedAccountDialog from './components/ui/BlockedAccountDialog.jsx';
 import { useState } from 'react';
+import BlockedAccountBanner from './components/ui/BlockedUserBanner.jsx';
 
 function App() {
   const { user, profile } = useAuth();
@@ -45,10 +46,15 @@ function App() {
   };
   return (
     <BrowserRouter>
+      {user && profile?.is_blocked && (
+        <BlockedAccountBanner />
+      )}
+
       <BlockedAccountDialog
         open={blockedDialogOpen}
         onAcknowledge={handleBlockedNoticeAcknowledge}
       />
+
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
