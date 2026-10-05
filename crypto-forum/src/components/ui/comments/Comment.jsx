@@ -7,6 +7,7 @@ function Comment({
     depth = 0,
     parentComment = null,
     userId,
+    isBlocked,
     commentVotes,
 
     editingCommentId,
@@ -177,6 +178,7 @@ function Comment({
                             type="button"
                             size="xs"
                             variant="ghost"
+                            disabled={isBlocked}
                             onClick={() => {
                                 setReplyingTo(comment.id);
                                 setReplyContent('');
@@ -191,6 +193,7 @@ function Comment({
                                     type="button"
                                     size="xs"
                                     variant="ghost"
+                                    disabled={isBlocked}
                                     onClick={() => {
                                         setEditingCommentId(comment.id);
                                         setEditCommentContent(comment.content);
@@ -262,6 +265,7 @@ function Comment({
                             depth={depth + 1}
                             parentComment={comment}
                             userId={userId}
+                            isBlocked={isBlocked}
                             commentVotes={commentVotes}
 
                             editingCommentId={editingCommentId}

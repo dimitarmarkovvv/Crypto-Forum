@@ -44,8 +44,25 @@ with check (
 create policy "Users can update their own comments"
 on public.comments
 for update
-using (author_id = auth.uid())
-with check (author_id = auth.uid());
+to authenticated
+using (
+    author_id = auth.uid()
+    and exists (
+        select 1
+        from public.profiles
+        where id = auth.uid()
+        and is_blocked = false
+    )
+)
+with check (
+    author_id = auth.uid()
+    and exists (
+        select 1
+        from public.profiles
+        where id = auth.uid()
+        and is_blocked = false
+    )
+);
 
 grant delete on public.comments to authenticated;
 
