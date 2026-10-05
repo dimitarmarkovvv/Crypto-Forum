@@ -169,7 +169,7 @@ function PostsPage() {
 
                             {post.author_id === user.id && (
                                 <HStack mt={4}>
-                                    <Button size="sm" onClick={() => navigate(`/posts/${post.id}/edit`)}>
+                                    <Button size="sm" disabled={profile.is_blocked} onClick={() => navigate(`/posts/${post.id}/edit`)}>
                                         Edit
                                     </Button>
 

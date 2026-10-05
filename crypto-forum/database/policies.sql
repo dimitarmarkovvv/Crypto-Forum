@@ -17,8 +17,25 @@ with check (
 create policy "Users can update their own posts"
 on public.posts
 for update
-using (author_id = auth.uid())
-with check (author_id = auth.uid());
+to authenticated
+using (
+    author_id = auth.uid()
+    and exists (
+        select 1
+        from public.profiles
+        where id = auth.uid()
+        and is_blocked = false
+    )
+)
+with check (
+    author_id = auth.uid()
+    and exists (
+        select 1
+        from public.profiles
+        where id = auth.uid()
+        and is_blocked = false
+    )
+);
 
 create policy "Users can delete their own posts"
 on public.posts
