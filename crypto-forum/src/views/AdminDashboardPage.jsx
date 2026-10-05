@@ -93,11 +93,15 @@ function AdminDashboardPage() {
                     : 'User unblocked',
                 type: 'success',
             });
+
+            return true;
         } catch (error) {
             toaster.create({
                 title: error.message,
                 type: 'error',
             });
+
+            return false;
         }
     };
 
@@ -106,12 +110,15 @@ function AdminDashboardPage() {
             return;
         }
 
-        await handleBlockToggle(
+        const success = await handleBlockToggle(
             userToBlock.id,
             true
         );
 
-        setUserToBlock(null);
+        if (success) {
+            setUserToBlock(null);
+        }
+
     };
 
     return (
