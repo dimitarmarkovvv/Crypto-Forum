@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { AuthContext } from './AuthContext';
 import { supabase } from '../supabase/supabaseClient';
+import { useProfileSubscription } from '../hooks/useProfileSubscription';
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState(null);
+  useProfileSubscription(user?.id, setProfile);
 
   const [
     blockedNoticeAcknowledgedUserId,
