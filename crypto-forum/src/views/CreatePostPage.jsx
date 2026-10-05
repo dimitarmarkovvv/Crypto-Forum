@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useState } from 'react';
 import { createPost } from '../services/posts';
-import { Button, Container, Field, Heading, Input, Stack, Textarea } from '@chakra-ui/react';
+import { Button, Container, Field, Heading, Input, Stack, Textarea, Alert} from '@chakra-ui/react';
 import { toaster } from '../components/ui/toast-store.js';
 
 function CreatePostPage() {
@@ -14,16 +14,37 @@ function CreatePostPage() {
 
     const navigate = useNavigate();
 
+    if (profile?.is_blocked) {
+        return (
+            <Container maxW="2x1" py={10}>
+                <Alert.Root status="error">
+                    <Alert.Indicator />
+
+                    <Alert.Content>
+                        <Alert.Title>
+                            You cannot Create posts
+                        </Alert.Title>
+
+                        <Alert.Description>
+                            Your account is currently blocked. You can still browse the forum,
+                            but you cannot create posts until an administrator unblocks your
+                            account.
+                        </Alert.Description>
+                    </Alert.Content>
+                </Alert.Root>
+
+                <Button mt={4} onClick={() => navigate('/posts')}>
+                    Back to Posts
+                </Button>
+            </Container>
+        )
+    }
+
     const handleSubmit = async (event) => {
         event.preventDefault();
 
         const trimmedTitle = title.trim();
         const trimmedContent = content.trim();
-
-        if (profile?.is_blocked) {
-        toaster.create({ title: 'Your account has been blocked.', type: 'error' });
-        return;
-        };
 
         if (trimmedTitle.length < 16 || trimmedTitle.length > 64) {
             toaster.create({ title: 'Title must be between 16 and 64 characters.', type: 'error' });
