@@ -42,6 +42,19 @@ on public.posts
 for delete
 using (author_id = auth.uid());
 
+create policy "Admins can delete any post"
+on public.posts
+for delete
+to authenticated
+using (
+    exists (
+        select 1
+        from public.profiles
+        where id = auth.uid()
+          and role = 'admin'
+    )
+);
+
 -- Comments
 alter table public.comments enable row level security;
 
