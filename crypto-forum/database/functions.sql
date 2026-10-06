@@ -157,7 +157,11 @@ revoke all on function public.promote_user(uuid, text) from public;
 grant execute on function public.promote_user(uuid, text)
 to authenticated;
 
-create or replace function public.admin_search_users(search_term text default '')
+create or replace function public.admin_search_users(
+    search_term text default '',
+    page_number integer default 1,
+    page_size integer default 10
+)
 returns table (
     id uuid,
     username text,
@@ -166,7 +170,8 @@ returns table (
     email text,
     avatar_url text,
     role text,
-    is_blocked boolean
+    is_blocked boolean,
+    total_count bigint
 )
 language plpgsql
 security definer
@@ -177,39 +182,41 @@ begin
         select 1
         from public.profiles
         where profiles.id = auth.uid()
-        and profiles.role = 'admin'
-    ) then 
-       raise exception 'Only admins can search users.';
-       end if;
-       
-       return query
-       select
-          p.id,
-          p.username,
-          p.first_name,
-          p.last_name,
-          p.email,
-          p.avatar_url,
-          p.role,
-          p.is_blocked
-        from public.profiles p 
-        where
-          trim(search_term) = ''
-          or p.username ilike '%' || trim(search_term) || '%'
-          or p.email ilike '%' || trim(search_term) || '%'
-          or (p.first_name || ' ' || p.last_name)
-              ilike '%' || trim(search_term) || '%'
-        order by p.username
-        limit 50;
+          and profiles.role = 'admin'
+    ) then
+        raise exception 'Only admins can search users.';
+    end if;
+
+    return query
+    select
+        p.id,
+        p.username,
+        p.first_name,
+        p.last_name,
+        p.email,
+        p.avatar_url,
+        p.role,
+        p.is_blocked,
+        count(*) over() as total_count
+    from public.profiles p
+    where
+        trim(search_term) = ''
+        or p.username ilike '%' || trim(search_term) || '%'
+        or p.email ilike '%' || trim(search_term) || '%'
+        or (p.first_name || ' ' || p.last_name)
+            ilike '%' || trim(search_term) || '%'
+    order by p.username
+    limit page_size
+    offset (page_number - 1) * page_size;
 end;
 $$;
 
 revoke all
-on function public.admin_search_users(text)
+on function public.admin_search_users(text, integer, integer)
 from public;
 
 grant execute
-on function public.admin_search_users(text)
+on function public.admin_search_users(text, integer, integer)
 to authenticated;
 
 -- Block / unblock user

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { adminSearchUsers, getAvatarUrl, setUserBlocked } from "../../../services/profiles";
+import { adminSearchUsers, getAvatarUrl, setUserBlocked } from "../../../services/profiles.js";
 import { useNavigate } from 'react-router-dom';
 import { toaster } from "../toast-store";
 import {
@@ -13,7 +13,7 @@ import {
     Table,
     Text,
 } from '@chakra-ui/react';
-import BlockUserDialog from "./BlockUserDialog";
+import BlockUserDialog from "./BlockUserDialog.jsx";
 
 function AdminUserManagement() {
     const [searchTerm, setSearchTerm] = useState('');
