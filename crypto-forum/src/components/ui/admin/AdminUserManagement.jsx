@@ -31,6 +31,15 @@ function AdminUserManagement() {
 
     const navigate = useNavigate();
 
+    const firstUserNumber =
+        (userPage - 1) * USERS_PER_PAGE + 1;
+
+    const lastUserNumber =
+        Math.min(
+            userPage * USERS_PER_PAGE,
+            totalUsers
+        );
+
     useEffect(() => {
         const loadUsers = async () => {
             try {
@@ -104,7 +113,7 @@ function AdminUserManagement() {
     };
 
     return (
-        <>
+        <Box>
             <Box>
                 <Heading size="lg" mb={1}>
                     User Management
@@ -301,6 +310,10 @@ function AdminUserManagement() {
                     Page {userPage} of {totalPages}
                 </Text>
 
+                <Text fontSize="sm" color="fg.muted">
+                    Showing {firstUserNumber}-{lastUserNumber} of {totalUsers} users
+                </Text>
+
                 <Box display="flex" gap={2}>
                     <Button
                         size="sm"
@@ -332,7 +345,7 @@ function AdminUserManagement() {
                 setUserToBlock={setUserToBlock}
                 handleConfirmBlock={handleConfirmBlock}
             />
-        </>
+        </Box>
     );
 }
 
