@@ -98,7 +98,7 @@ to anon, authenticated;
 -- Search users
 -- Returns profiles matching username or first+last name
 
-create function public.search_users(search_term text)
+create or replace function public.search_users(search_term text)
 returns table (
     id uuid,
     username text,
@@ -179,7 +179,7 @@ begin
         where profiles.id = auth.uid()
         and profiles.role = 'admin'
     ) then 
-       raise exception 'Only admins can search users.'
+       raise exception 'Only admins can search users.';
        end if;
        
        return query
@@ -187,7 +187,7 @@ begin
           p.id,
           p.username,
           p.first_name,
-          p.last_name
+          p.last_name,
           p.email,
           p.avatar_url,
           p.role,
@@ -201,7 +201,7 @@ begin
               ilike '%' || trim(search_term) || '%'
         order by p.username
         limit 50;
-end
+end;
 $$;
 
 revoke all
