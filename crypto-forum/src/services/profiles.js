@@ -99,20 +99,31 @@ export const getUserProfileById = async (userId) => {
     return data
 }
 
-export const adminSearchUsers = async (searchTerm = '') => {
-  const {data, error } = await supabase.rpc(
+export const adminSearchUsers = async (
+  searchTerm = '',
+  page = 1,
+  pageSize = 10
+) => {
+  const { data, error } = await supabase.rpc(
     'admin_search_users',
     {
       search_term: searchTerm,
+      page_number: page,
+      page_size: pageSize,
     }
-  )
+  );
 
-  if(error) {
+  if (error) {
     throw error;
   }
 
-  return data ?? [];
-}
+  const users = data ?? [];
+
+  return {
+    users,
+    totalCount: users[0]?.total_count ?? 0,
+  };
+};
 
 export const setUserBlocked = async (targetUserId, blocked) => {
   const {data, error} = await supabase.rpc(
