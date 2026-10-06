@@ -9,11 +9,6 @@ export function AuthProvider({ children }) {
   const [profile, setProfile] = useState(null);
   useProfileSubscription(user?.id, setProfile);
 
-  const [
-    blockedNoticeAcknowledgedUserId,
-    setBlockedNoticeAcknowledgedUserId,
-  ] = useState(null);
-
   const fetchProfile = async (userId) => {
     const { data: profileData } = await supabase
       .from('profiles')
@@ -59,15 +54,11 @@ export function AuthProvider({ children }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (_event, session) => {
         const authUser = session?.user ?? null;
 
         setUser(authUser);
         setLoading(true);
-
-        if (event === 'SIGNED_OUT') {
-          setBlockedNoticeAcknowledgedUserId(null);
-        }
 
         if (authUser) {
           await fetchProfile(authUser.id);
@@ -91,9 +82,6 @@ export function AuthProvider({ children }) {
         profile,
         loading,
         refreshProfile,
-
-        blockedNoticeAcknowledgedUserId,
-        setBlockedNoticeAcknowledgedUserId,
       }}
     >
       {children}
