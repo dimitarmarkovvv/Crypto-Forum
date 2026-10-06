@@ -20,6 +20,14 @@ function AdminUserManagement() {
     const [users, setUsers] = useState([]);
     const [loadingUsers, setLoadingUsers] = useState(true);
     const [userToBlock, setUserToBlock] = useState(null);
+    const [userPage, setUserPage] = useState(1);
+    const [totalUsers, setTotalUsers] = useState(0);
+
+    const USERS_PER_PAGE = 10;
+
+    const totalPages = Math.ceil(
+        totalUsers / USERS_PER_PAGE
+    );
 
     const navigate = useNavigate();
 
@@ -28,9 +36,14 @@ function AdminUserManagement() {
             try {
                 setLoadingUsers(true);
 
-                const data = await adminSearchUsers(searchTerm);
+                const data = await adminSearchUsers(
+                    searchTerm,
+                    userPage,
+                    USERS_PER_PAGE
+                );
 
-                setUsers(data);
+                setUsers(data.users);
+                setTotalUsers(data.totalCount);
             } catch (error) {
                 toaster.create({
                     title: error.message,
@@ -42,7 +55,7 @@ function AdminUserManagement() {
         };
 
         loadUsers();
-    }, [searchTerm]);
+    }, [searchTerm, userPage]);
 
     const handleBlockToggle = async (userId, blocked) => {
         try {
@@ -107,9 +120,10 @@ function AdminUserManagement() {
                 <Input
                     placeholder="Search by username, email or name..."
                     value={searchTerm}
-                    onChange={(event) =>
+                    onChange={(event) => {
                         setSearchTerm(event.target.value)
-                    }
+                        setUserPage(1)
+                    }}
                     maxW="lg"
                     mb={5}
                 />
@@ -275,6 +289,41 @@ function AdminUserManagement() {
                         </Table.Root>
                     </Box>
                 )}
+            </Box>
+
+            <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                mt={4}
+            >
+                <Text fontSize="sm" color="fg.muted">
+                    Page {userPage} of {totalPages}
+                </Text>
+
+                <Box display="flex" gap={2}>
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={userPage === 1}
+                        onClick={() =>
+                            setUserPage((page) => page - 1)
+                        }
+                    >
+                        Previous
+                    </Button>
+
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={userPage >= totalPages}
+                        onClick={() =>
+                            setUserPage((page) => page + 1)
+                        }
+                    >
+                        Next
+                    </Button>
+                </Box>
             </Box>
 
 
