@@ -96,7 +96,7 @@ grant execute on function public.get_most_commented_posts()
 to anon, authenticated;
 
 -- Search users
--- Returns profiles matching username, email, or first+last name
+-- Returns profiles matching username or first+last name
 
 create function public.search_users(search_term text)
 returns table (
@@ -123,14 +123,6 @@ as $$
             ilike '%' || search_term || '%'
     limit 20;
 $$;
-
-revoke all
-on function public.search_users(text)
-from public;
-
-grant execute
-on function public.search_users(text)
-to authenticated;
 
 revoke all on function public.search_users(text) from public;
 
@@ -195,6 +187,7 @@ begin
           p.id,
           p.username,
           p.first_name,
+          p.last_name
           p.email,
           p.avatar_url,
           p.role,
