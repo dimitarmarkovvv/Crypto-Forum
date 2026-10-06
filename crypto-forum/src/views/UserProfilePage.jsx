@@ -38,7 +38,7 @@ function UserProfilePage() {
                     pageSize: 100,
                 });
 
-                setPosts(userPosts);
+                setPosts(userPosts.posts);
 
                 const userComments = await getCommentsByAuthorId(id);
                 setComments(userComments);

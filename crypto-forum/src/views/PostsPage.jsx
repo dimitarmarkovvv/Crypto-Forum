@@ -69,7 +69,7 @@ function PostsPage() {
                     authorID: filter === 'mine' ? user.id : null,
                 });
 
-                setPosts(postsData);
+                setPosts(postsData.posts);
             } catch (error) {
                 toaster.create({ title: error.message, type: 'error' });
             } finally {

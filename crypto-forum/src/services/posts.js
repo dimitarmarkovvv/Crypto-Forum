@@ -12,7 +12,9 @@ export const getPosts = async ({
 
   let query = supabase
     .from('posts')
-    .select('*, profiles(username), comments(count)')
+    .select('*, profiles(username), comments(count)',
+      { count: 'exact' }
+    );
 
   if (search.trim()) {
     query = query.ilike('title', `${search.trim()}%`)
@@ -28,16 +30,21 @@ export const getPosts = async ({
     })
     .range(from, to)
 
-  const { data, error } = await query
+  const { data, error, count } = await query
 
   if (error) {
     throw error;
   };
 
-  return (data ?? []).map((post) => ({
+  const posts = (data ?? []).map((post) => ({
     ...post,
     commentCount: post.comments?.[0]?.count ?? 0,
   }));
+
+  return {
+    posts,
+    totalCount: count ?? 0,
+  };
 };
 
 export const createPost = async ({ title, content }, authorID) => {
@@ -85,13 +92,13 @@ export const deletePost = async (postId) => {
 };
 
 export const getPostById = async (id) => {
-  const {data, error} = await supabase
-  .from('posts')
-  .select('*, profiles(username)')
-  .eq('id', id)
-  .single();
+  const { data, error } = await supabase
+    .from('posts')
+    .select('*, profiles(username)')
+    .eq('id', id)
+    .single();
 
-  if(error){
+  if (error) {
     throw error;
   };
 

@@ -11,10 +11,10 @@ import { getForumStats } from '../services/homepage.js';
 import { toaster } from '../components/ui/toast-store.js';
 import AdminUserManagement
     from '../components/ui/admin/AdminUserManagement.jsx';
+import AdminPostManagement from '../components/ui/admin/AdminPostManagement.jsx';
 
 
 function AdminDashboardPage() {
-
 
     const [stats, setStats] = useState({
         totalUsers: 0,
@@ -113,15 +113,7 @@ function AdminDashboardPage() {
 
                 <AdminUserManagement />
 
-                <Box>
-                    <Heading size="lg" mb={1}>
-                        Post Management
-                    </Heading>
-
-                    <Text color="fg.muted">
-                        Post moderation tools will be added here next.
-                    </Text>
-                </Box>
+                <AdminPostManagement />
             </Stack>
         </Container>
     );
