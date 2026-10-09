@@ -1,10 +1,10 @@
 import { useAuth } from '../hooks/useAuth';
 import { logoutUser } from '../services/auth';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link as RouterLink} from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getForumStats, getMostCommentedPosts, getRecentPosts } from '../services/homepage';
 import { formatDate } from '../utils/formatDate.js'
-import { Box, Button, Center, Container, Heading, Spinner, Stack, Text, Avatar } from '@chakra-ui/react';
+import { Box, Button, Center, Container, Heading, Spinner, Stack, Text, Avatar, Link } from '@chakra-ui/react';
 import { getAvatarUrl } from '../services/profiles.js';
 
 function HomePage() {
@@ -107,7 +107,7 @@ function HomePage() {
             )}
 
             <Box as="section" mt={8}>
-                <Text>Crypto Forum is a community for discussing cryptocurrency news, trading strategies, and blockchain technology.</Text>
+                <Text>LearnCrypto is a community for discussing cryptocurrency news, trading strategies, and blockchain technology.</Text>
             </Box>
 
             {stats && (
@@ -124,9 +124,13 @@ function HomePage() {
                     {posts.map((post) => (
                         <Box key={post.id}>
                             <Heading size="md" asChild>
-                            <Link to={`/posts/${post.id}`}>{post.title}</Link>
+                            <RouterLink to={`/posts/${post.id}`}>{post.title}</RouterLink>
                             </Heading>
-                            <Text color="fg.muted">by {post.author} — {formatDate(post.created_at)}</Text>
+                            <Text color="fg.muted"> by {' '}
+                            <Link asChild color="inherit">
+                            <RouterLink to={`/users/${post.author_id}`}>{post.author}</RouterLink>
+                            </Link>
+                            {' - '} {formatDate(post.created_at)}</Text>
                         </Box>
                     ))}
                 </Stack>
@@ -138,9 +142,13 @@ function HomePage() {
                     {comments.map((comment) => (
                         <Box key={comment.id}>
                             <Heading size="md" asChild>
-                            <Link to={`/posts/${comment.id}`}>{comment.title}</Link>
+                            <RouterLink to={`/posts/${comment.id}`}>{comment.title}</RouterLink>
                             </Heading>
-                            <Text color="fg.muted">by {comment.author} — {formatDate(comment.created_at)}</Text>
+                            <Text color="fg.muted"> by {' '}
+                                <Link asChild color="inherit">
+                                <RouterLink to={`/users/${comment.author_id}`}>{comment.author}</RouterLink>
+                                </Link>
+                                {' - '} {formatDate(comment.created_at)}</Text>
                         </Box>
                     ))}
                 </Stack>
