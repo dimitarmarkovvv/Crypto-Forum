@@ -47,7 +47,7 @@ function HomePage() {
 
     return (
         <Container maxW="3xl" py={10}>
-            <Heading>Crypto Forum</Heading>
+            <Heading>LearnCrypto</Heading>
 
             {user ? (
                 <Stack direction="row" align="center" gap={4} mt={4}>
