@@ -16,6 +16,8 @@ import { useAuth } from './hooks/useAuth.js';
 import BlockedAccountDialog from './components/ui/BlockedAccountDialog.jsx';
 import { useState } from 'react';
 import BlockedAccountBanner from './components/ui/BlockedUserBanner.jsx';
+import { ColorModeButton } from './components/ui/color-mode.jsx';
+import { Box } from '@chakra-ui/react';
 
 function App() {
   const { user, profile } = useAuth();
@@ -49,6 +51,10 @@ function App() {
       {user && profile?.is_blocked && (
         <BlockedAccountBanner />
       )}
+
+      <Box position="fixed" top="4" right="4" zIndex="sticky">
+      <ColorModeButton />
+      </Box>
 
       <BlockedAccountDialog
         open={blockedDialogOpen}
