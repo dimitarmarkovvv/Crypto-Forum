@@ -58,7 +58,6 @@ export function AuthProvider({ children }) {
         const authUser = session?.user ?? null;
 
         setUser(authUser);
-        setLoading(true);
 
         if (authUser) {
           await fetchProfile(authUser.id);
@@ -66,7 +65,6 @@ export function AuthProvider({ children }) {
           setProfile(null);
         }
 
-        setLoading(false);
       }
     );
 
