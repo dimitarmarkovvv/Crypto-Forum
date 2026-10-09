@@ -73,28 +73,6 @@ function HomePage() {
                     >
                         Logout
                     </Button>
-                    <Avatar.Root
-                        w="40px"
-                        h="40px"
-                        borderRadius="full"
-                        overflow="hidden"
-                        cursor="pointer"
-                        _hover={{
-                            opacity: 0.8,
-                        }}
-                        onClick={() => navigate(`/users/${user.id}`)}
-                    >
-                        <Avatar.Fallback
-                            name={`${profile.first_name} ${profile.last_name}`}
-                        />
-
-                        {profile.avatar_url && (
-                            <Avatar.Image
-                                src={getAvatarUrl(profile.avatar_url)}
-                                alt={`${profile.username}'s avatar`}
-                            />
-                        )}
-                    </Avatar.Root>
 
                     {profile?.role === 'admin' && (
                         <Button onClick={() => navigate('/admin')}>

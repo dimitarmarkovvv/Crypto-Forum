@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { LoginPage } from './views/LoginPage';
 import HomePage from './views/Homepage.jsx';
 import { RegisterPage } from './views/RegisterPage';
@@ -17,7 +17,8 @@ import BlockedAccountDialog from './components/ui/BlockedAccountDialog.jsx';
 import { useState } from 'react';
 import BlockedAccountBanner from './components/ui/BlockedUserBanner.jsx';
 import { ColorModeButton } from './components/ui/color-mode.jsx';
-import { Box } from '@chakra-ui/react';
+import { Box, Stack, Avatar } from '@chakra-ui/react';
+import { getAvatarUrl } from './services/profiles.js';
 
 function App() {
   const { user, profile } = useAuth();
@@ -53,7 +54,25 @@ function App() {
       )}
 
       <Box position="fixed" top="4" right="4" zIndex="sticky">
-      <ColorModeButton />
+        <Stack direction="row" align="center" gap="3">
+          <ColorModeButton />
+
+          {user && profile && (
+            <Link to={`/users/${user.id}`}>
+              <Avatar.Root w="40px" h="40px" borderRadius="full" overflow="hidden">
+                <Avatar.Fallback
+                  name={`${profile.first_name} ${profile.last_name}`}
+                />
+                {profile.avatar_url && (
+                  <Avatar.Image
+                    src={getAvatarUrl(profile.avatar_url)}
+                    alt={`${profile.username}'s avatar`}
+                  />
+                )}
+              </Avatar.Root>
+            </Link>
+          )}
+        </Stack>
       </Box>
 
       <BlockedAccountDialog
