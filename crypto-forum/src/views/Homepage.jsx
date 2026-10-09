@@ -1,6 +1,6 @@
 import { useAuth } from '../hooks/useAuth';
 import { logoutUser } from '../services/auth';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getForumStats, getMostCommentedPosts, getRecentPosts } from '../services/homepage';
 import { formatDate } from '../utils/formatDate.js'
@@ -123,7 +123,9 @@ function HomePage() {
                 <Stack gap={4}>
                     {posts.map((post) => (
                         <Box key={post.id}>
-                            <Heading size="md">{post.title}</Heading>
+                            <Heading size="md" asChild>
+                            <Link to={`/posts/${post.id}`}>{post.title}</Link>
+                            </Heading>
                             <Text color="fg.muted">by {post.author} — {formatDate(post.created_at)}</Text>
                         </Box>
                     ))}
@@ -135,7 +137,9 @@ function HomePage() {
                 <Stack gap={4}>
                     {comments.map((comment) => (
                         <Box key={comment.id}>
-                            <Heading size="md">{comment.title}</Heading>
+                            <Heading size="md" asChild>
+                            <Link to={`/posts/${comment.id}`}>{comment.title}</Link>
+                            </Heading>
                             <Text color="fg.muted">by {comment.author} — {formatDate(comment.created_at)}</Text>
                         </Box>
                     ))}
