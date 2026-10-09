@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { deletePost, getPosts } from "../services/posts";
 import { formatDate } from "../utils/formatDate";
 import { useAuth } from '../hooks/useAuth';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link as RouterLink } from "react-router-dom";
 import {
     Box,
     Button,
@@ -11,6 +11,7 @@ import {
     Heading,
     HStack,
     Input,
+    Link,
     NativeSelect,
     Spinner,
     Stack,
@@ -146,21 +147,20 @@ function PostsPage() {
                 <Stack gap={6}>
                     {posts.map((post) => (
                         <Box key={post.id} as="article" borderWidth="1px" borderRadius="md" p={4}>
-                            <Heading size="md" onClick={() => navigate(`/posts/${post.id}`)} cursor="pointer">{post.title}</Heading>
+                            <Heading size="md" asChild>
+                                <RouterLink to={`/posts/${post.id}`}>{post.title}</RouterLink>
+                            </Heading>
 
                             <Text mt={2}>{post.content}</Text>
 
                             <Text mt={2} color="fg.muted">
                                 by{' '}
-                                <Text
-                                    as="span"
-                                    cursor="pointer"
-                                    _hover={{ textDecoration: 'underline' }}
-                                    onClick={() => navigate(`/users/${post.author_id}`)}
-                                >
-                                    {post.profiles.username}
-                                </Text>
-                                {'-'}
+                                <Link asChild>
+                                    <RouterLink to={`/users/${post.author_id}`}>
+                                        {post.profiles.username}
+                                    </RouterLink>
+                                </Link>
+                                {' - '}
                                 {formatDate(post.created_at)}
                             </Text>
                             <Text mt={1} color="fg.muted" fontSize="sm">
