@@ -4,7 +4,7 @@ import { useNavigate, Link as RouterLink} from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getForumStats, getMostCommentedPosts, getRecentPosts } from '../services/homepage';
 import { formatDate } from '../utils/formatDate.js'
-import { Box, Button, Center, Container, Heading, SimpleGrid, Spinner, Stack, Text, Link } from '@chakra-ui/react';
+import { Box, Button, Card, Center, Container, Heading, SimpleGrid, Spinner, Stack, Text, Link } from '@chakra-ui/react';
 
 function HomePage() {
     const { user, profile, loading } = useAuth();
@@ -45,12 +45,12 @@ function HomePage() {
     };
 
     return (
-        <Container maxW="3xl" py={10}>
+        <Container maxW="6xl" py={10}>
             <Heading>LearnCrypto</Heading>
 
             {user ? (
                 <Stack direction="row" align="center" gap={4} mt={4}>
-                    <Text>Logged in as: {user.email}</Text>
+                    <Text color="fg.muted">Logged in as: {user.email}</Text>
 
                     <Button
                         size="sm"
@@ -80,57 +80,69 @@ function HomePage() {
                     )}
                 </Stack>
             ) : (
-                <Text mt={4}>You are logged out</Text>
+                <Text mt={4} color="fg.muted">You are logged out</Text>
             )}
 
-            <Box as="section" mt={8}>
-                <Text>LearnCrypto is a community for discussing cryptocurrency news, trading strategies, and blockchain technology.</Text>
-            </Box>
+            <Card.Root as="section" mt={8}>
+                <Card.Body>
+                    <Text color="fg.muted">LearnCrypto is a community for discussing cryptocurrency news, trading strategies, and blockchain technology.</Text>
+                </Card.Body>
+            </Card.Root>
 
             {stats && (
-                <Box as="section" mt={8}>
-                    <Text>Users: {stats.totalUsers}</Text>
-                    <Text>Posts: {stats.totalPosts}</Text>
-                    <Text>Comments: {stats.totalComments}</Text>
-                </Box>
+                <Card.Root as="section" mt={8}>
+                    <Card.Body>
+                        <Text color="fg.muted">Users: {stats.totalUsers}</Text>
+                        <Text color="fg.muted">Posts: {stats.totalPosts}</Text>
+                        <Text color="fg.muted">Comments: {stats.totalComments}</Text>
+                    </Card.Body>
+                </Card.Root>
             )}
 
             <SimpleGrid columns={{ base: 1, md: 2 }} gap="8" mt={8}>
-                <Box as="section">
-                    <Heading size="lg" mb={4}>Recent Posts</Heading>
-                    <Stack gap={4}>
-                        {posts.map((post) => (
-                            <Box key={post.id}>
-                                <Heading size="md" asChild>
-                                <RouterLink to={`/posts/${post.id}`}>{post.title}</RouterLink>
-                                </Heading>
-                                <Text color="fg.muted"> by {' '}
-                                <Link asChild color="inherit">
-                                <RouterLink to={`/users/${post.author_id}`}>{post.author}</RouterLink>
-                                </Link>
-                                {' - '} {formatDate(post.created_at)}</Text>
-                            </Box>
-                        ))}
-                    </Stack>
-                </Box>
-
-                <Box as="section">
-                    <Heading size="lg" mb={4}>Most commented posts</Heading>
-                    <Stack gap={4}>
-                        {comments.map((comment) => (
-                            <Box key={comment.id}>
-                                <Heading size="md" asChild>
-                                <RouterLink to={`/posts/${comment.id}`}>{comment.title}</RouterLink>
-                                </Heading>
-                                <Text color="fg.muted"> by {' '}
-                                    <Link asChild color="inherit">
-                                    <RouterLink to={`/users/${comment.author_id}`}>{comment.author}</RouterLink>
+                <Card.Root as="section">
+                    <Card.Header>
+                        <Heading size="lg">Recent Posts</Heading>
+                    </Card.Header>
+                    <Card.Body>
+                        <Stack gap={4}>
+                            {posts.map((post) => (
+                                <Box key={post.id}>
+                                    <Heading size="md" asChild>
+                                    <RouterLink to={`/posts/${post.id}`}>{post.title}</RouterLink>
+                                    </Heading>
+                                    <Text color="fg.muted"> by {' '}
+                                    <Link asChild>
+                                    <RouterLink to={`/users/${post.author_id}`}>{post.author}</RouterLink>
                                     </Link>
-                                    {' - '} {formatDate(comment.created_at)}</Text>
-                            </Box>
-                        ))}
-                    </Stack>
-                </Box>
+                                    {' - '} {formatDate(post.created_at)}</Text>
+                                </Box>
+                            ))}
+                        </Stack>
+                    </Card.Body>
+                </Card.Root>
+
+                <Card.Root as="section">
+                    <Card.Header>
+                        <Heading size="lg">Most commented posts</Heading>
+                    </Card.Header>
+                    <Card.Body>
+                        <Stack gap={4}>
+                            {comments.map((comment) => (
+                                <Box key={comment.id}>
+                                    <Heading size="md" asChild>
+                                    <RouterLink to={`/posts/${comment.id}`}>{comment.title}</RouterLink>
+                                    </Heading>
+                                    <Text color="fg.muted"> by {' '}
+                                        <Link asChild>
+                                        <RouterLink to={`/users/${comment.author_id}`}>{comment.author}</RouterLink>
+                                        </Link>
+                                        {' - '} {formatDate(comment.created_at)}</Text>
+                                </Box>
+                            ))}
+                        </Stack>
+                    </Card.Body>
+                </Card.Root>
             </SimpleGrid>
         </Container>
     );
