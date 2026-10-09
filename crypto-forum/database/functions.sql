@@ -30,7 +30,8 @@ returns table (
     id uuid,
     title text,
     author text,
-    created_at timestamptz
+    created_at timestamptz,
+    author_id uuid
 )
 language sql
 security definer
@@ -40,7 +41,8 @@ as $$
         p.id,
         p.title,
         pr.username as author,
-        p.created_at
+        p.created_at,
+        pr.id as author_id
     from public.posts p
     join public.profiles pr
         on pr.id = p.author_id
@@ -62,6 +64,7 @@ returns table (
     title text,
     author text,
     created_at timestamptz,
+    author_id uuid,
     comment_count bigint
 )
 language sql
@@ -73,6 +76,7 @@ as $$
         p.title,
         pr.username as author,
         p.created_at,
+        pr.id as author_id,
         count(c.id) as comment_count
     from public.posts p
     join public.profiles pr
@@ -80,6 +84,7 @@ as $$
     left join public.comments c
         on c.post_id = p.id
     group by
+        pr.id,
         p.id,
         p.title,
         pr.username,
