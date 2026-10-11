@@ -4,8 +4,9 @@ import { useNavigate, Link as RouterLink} from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getForumStats, getMostCommentedPosts, getRecentPosts } from '../services/homepage';
 import { formatDate } from '../utils/formatDate.js'
-import { Box, Button, Card, Center, Container, Heading, SimpleGrid, Spinner, Stack, Text, Link } from '@chakra-ui/react';
+import { Box, Button, Card, Center, Container, Flex, Heading, SimpleGrid, Spinner, Stack, Text, Link } from '@chakra-ui/react';
 import { CryptoTicker } from '../components/ui/CryptoTicker.jsx';
+import { LuNewspaper, LuUsers, LuShield, LuLogOut } from 'react-icons/lu';
 
 function HomePage() {
     const { user, profile, loading } = useAuth();
@@ -47,42 +48,41 @@ function HomePage() {
 
     return (
         <Container maxW="6xl" py={10}>
-            <Heading>LearnCrypto</Heading>
+            <Flex
+                as="header"
+                justify="space-between"
+                align="center"
+                gap="4"
+                pb="4"
+                mb="2"
+                borderBottomWidth="1px"
+            >
+                <Heading>LearnCrypto</Heading>
 
-            {user ? (
-                <Stack direction="row" align="center" gap={4} mt={4}>
-                    <Text color="fg.muted">Logged in as: {user.email}</Text>
-
-                    <Button
-                        size="sm"
-                        onClick={() => navigate('/posts')}
-                    >
-                        Posts
-                    </Button>
-
-                    <Button
-                        size="sm"
-                        onClick={() => navigate('/users/search')}
-                    >
-                        Search Users
-                    </Button>
-
-                    <Button
-                        size="sm"
-                        onClick={() => handleLogout(user.id)}
-                    >
-                        Logout
-                    </Button>
-
-                    {profile?.role === 'admin' && (
-                        <Button onClick={() => navigate('/admin')}>
-                            Admin Dashboard
+                {user ? (
+                    <Stack direction="row" align="center" gap="1">
+                        <Button variant="ghost" size="sm" onClick={() => navigate('/posts')}>
+                            <LuNewspaper /> Posts
                         </Button>
-                    )}
-                </Stack>
-            ) : (
-                <Text mt={4} color="fg.muted">You are logged out</Text>
-            )}
+
+                        <Button variant="ghost" size="sm" onClick={() => navigate('/users/search')}>
+                            <LuUsers /> Search Users
+                        </Button>
+
+                        {profile?.role === 'admin' && (
+                            <Button variant="ghost" size="sm" onClick={() => navigate('/admin')}>
+                                <LuShield /> Admin Dashboard
+                            </Button>
+                        )}
+
+                        <Button variant="ghost" size="sm" onClick={() => handleLogout(user.id)}>
+                            <LuLogOut /> Logout
+                        </Button>
+                    </Stack>
+                ) : (
+                    <Text color="fg.muted">You are logged out</Text>
+                )}
+            </Flex>
 
             <Card.Root as="section" mt={8}>
                 <Card.Body>
