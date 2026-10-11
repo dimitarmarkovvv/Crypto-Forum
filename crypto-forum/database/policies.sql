@@ -51,6 +51,27 @@ using (
     )
 );
 
+create policy "Admins can update any post"
+on public.posts
+for update
+to authenticated
+using (
+    exists (
+        select 1
+        from public.profiles
+        where id = auth.uid()
+          and role = 'admin'
+    )
+)
+with check (
+    exists (
+        select 1
+        from public.profiles
+        where id = auth.uid()
+          and role = 'admin'
+    )
+);
+
 create policy "Admins can delete any post"
 on public.posts
 for delete
@@ -103,7 +124,41 @@ with check (
     )
 );
 
+create policy "Admins can update any comment"
+on public.comments
+for update
+to authenticated
+using (
+    exists (
+        select 1
+        from public.profiles
+        where id = auth.uid()
+          and role = 'admin'
+    )
+)
+with check (
+    exists (
+        select 1
+        from public.profiles
+        where id = auth.uid()
+          and role = 'admin'
+    )
+);
+
 grant delete on public.comments to authenticated;
+
+create policy "Admins can delete any comment"
+on public.comments
+for delete
+to authenticated
+using (
+    exists (
+        select 1
+        from public.profiles
+        where id = auth.uid()
+          and role = 'admin'
+    )
+);
 
 create policy "Users can delete their own comments"
 on public.comments
