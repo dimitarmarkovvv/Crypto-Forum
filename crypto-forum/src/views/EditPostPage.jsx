@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Button, Center, Container, Field, Heading, Input, Spinner, Stack, Textarea, Box, Text } from '@chakra-ui/react';
 import { toaster } from '../components/ui/toast-store.js';
 import { useAuth } from "../hooks/useAuth.js";
+import { Header } from '../components/ui/Header.jsx';
 
 function EditPostPage() {
     const navigate = useNavigate();
@@ -117,8 +118,10 @@ function EditPostPage() {
     }
 
     return (
-        <Container maxW="2xl" py={10}>
-            <Heading mb={6}>Edit Post</Heading>
+        <Container maxW="4xl" py={10}>
+            <Header />
+
+            <Heading mt={8} mb={6}>Edit Post</Heading>
 
             <form onSubmit={handleSubmit}>
                 <Stack gap={4}>
@@ -144,13 +147,26 @@ function EditPostPage() {
                             onChange={(event) => setContent(event.target.value)}
                             minLength={32}
                             maxLength={8192}
+                            rows={14}
+                            resize="vertical"
                             required
                         />
                     </Field.Root>
 
-                    <Button type="submit" loading={loading} loadingText="Saving...">
-                        Save changes
-                    </Button>
+                    <Stack direction="row" gap={3}>
+                        <Button type="submit" loading={loading} loadingText="Saving...">
+                            Save changes
+                        </Button>
+
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            disabled={loading}
+                            onClick={() => navigate(`/posts/${id}`)}
+                        >
+                            Cancel
+                        </Button>
+                    </Stack>
                 </Stack>
             </form>
         </Container>
