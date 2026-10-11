@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { getForumStats, getMostCommentedPosts, getRecentPosts } from '../services/homepage';
 import { formatDate } from '../utils/formatDate.js'
 import { Box, Button, Card, Center, Container, Heading, SimpleGrid, Spinner, Stack, Text, Link } from '@chakra-ui/react';
+import { CryptoTicker } from '../components/ui/CryptoTicker.jsx';
 
 function HomePage() {
     const { user, profile, loading } = useAuth();
@@ -98,6 +99,8 @@ function HomePage() {
                     </Card.Body>
                 </Card.Root>
             )}
+
+            <CryptoTicker />
 
             <SimpleGrid columns={{ base: 1, md: 2 }} gap="8" mt={8}>
                 <Card.Root as="section">
