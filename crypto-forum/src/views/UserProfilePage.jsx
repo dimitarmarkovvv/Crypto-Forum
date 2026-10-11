@@ -8,6 +8,7 @@ import { getPosts } from '../services/posts.js';
 import { formatDate } from '../utils/formatDate.js';
 import { getCommentsByAuthorId } from '../services/comments.js';
 import { useAuth } from '../hooks/useAuth.js';
+import { Header } from '../components/ui/Header.jsx';
 
 function UserProfilePage() {
     const { id } = useParams();
@@ -95,6 +96,8 @@ function UserProfilePage() {
 
     return (
         <Container maxW="6xl" py={10}>
+            <Header />
+
             <Grid
                 templateColumns={{
                     base: '1fr',
