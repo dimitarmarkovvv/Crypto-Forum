@@ -27,7 +27,7 @@ export function Header() {
     const handleLogout = async (userId) => {
         try {
             await logoutUser(userId);
-            navigate('/login');
+            navigate('/');
         } catch (error) {
             console.error(error.message);
         }
