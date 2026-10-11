@@ -19,6 +19,7 @@ import {
 } from "@chakra-ui/react";
 import { toaster } from '../components/ui/toast-store.js';
 import { Header } from '../components/ui/Header.jsx';
+import DeletePostDialog from '../components/ui/DeletePostDialog.jsx';
 
 function PostsPage() {
     const { user, profile } = useAuth();
@@ -31,31 +32,24 @@ function PostsPage() {
     const [search, setSearch] = useState('');
     const [sort, setSort] = useState('newest');
     const [filter, setFilter] = useState('all');
+    const [postToDelete, setPostToDelete] = useState(null);
+    const [deleting, setDeleting] = useState(false);
 
     const pageSize = 10;
 
-    const handleDelete = (postId) => {
-        const toastId = toaster.create({
-            title: 'Delete this post?',
-            description: 'This action cannot be undone.',
-            type: 'warning',
-            duration: Infinity,
-            closable: true,
-            action: {
-                label: 'Delete',
-                onClick: async () => {
-                    toaster.dismiss(toastId);
+    const handleDelete = async () => {
+        setDeleting(true);
 
-                    try {
-                        await deletePost(postId);
+        try {
+            await deletePost(postToDelete);
 
-                        setPosts((prevPosts) => prevPosts.filter((p) => p.id !== postId));
-                    } catch (error) {
-                        toaster.create({ title: error.message, type: 'error' });
-                    };
-                },
-            },
-        });
+            setPosts((prevPosts) => prevPosts.filter((p) => p.id !== postToDelete));
+        } catch (error) {
+            toaster.create({ title: error.message, type: 'error' });
+        } finally {
+            setDeleting(false);
+            setPostToDelete(null);
+        };
     };
 
     useEffect(() => {
@@ -176,7 +170,7 @@ function PostsPage() {
                                         Edit
                                     </Button>
 
-                                    <Button size="sm" colorPalette="red" onClick={() => handleDelete(post.id)}>
+                                    <Button size="sm" colorPalette="red" onClick={() => setPostToDelete(post.id)}>
                                         Delete
                                     </Button>
                                 </HStack>
@@ -185,6 +179,13 @@ function PostsPage() {
                     ))}
                 </Stack>
             )}
+
+            <DeletePostDialog
+                open={postToDelete !== null}
+                setOpen={() => setPostToDelete(null)}
+                handleDeletePost={handleDelete}
+                loading={deleting}
+            />
         </Container>
     )
 }
