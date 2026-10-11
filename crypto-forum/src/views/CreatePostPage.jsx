@@ -2,9 +2,10 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useState } from 'react';
 import { createPost } from '../services/posts';
-import { Button, Container, Field, Heading, Input, Stack, Textarea, Alert} from '@chakra-ui/react';
+import { Alert, Box, Button, Card, Container, Field, Flex, Heading, Input, Stack, Text, Textarea } from '@chakra-ui/react';
 import { toaster } from '../components/ui/toast-store.js';
 import { Header } from '../components/ui/Header.jsx';
+import { LuPenLine } from 'react-icons/lu';
 
 function CreatePostPage() {
     const { user, profile } = useAuth();
@@ -82,54 +83,96 @@ function CreatePostPage() {
         <Container maxW="4xl" py={10}>
             <Header />
 
-            <Heading mt={8} mb={6}>Create Post</Heading>
+            <Card.Root mt={8}>
+                <Card.Header borderBottomWidth="1px" py="4">
+                    <Flex align="center" gap={2}>
+                        <Box color="brand.400"><LuPenLine /></Box>
 
-            <form onSubmit={handleSubmit}>
-                <Stack gap={4}>
-                    <Field.Root required>
-                        <Field.Label>Title</Field.Label>
-                        <Input
-                            type="text"
-                            id="title"
-                            value={title}
-                            onChange={(event) => setTitle(event.target.value)}
-                            minLength={16}
-                            maxLength={64}
-                            required
-                        />
-                    </Field.Root>
+                        <Heading size="sm" textTransform="uppercase" letterSpacing="wider">
+                            Create a post
+                        </Heading>
+                    </Flex>
+                </Card.Header>
 
-                    <Field.Root required>
-                        <Field.Label>Content</Field.Label>
+                <Card.Body>
+                    <form onSubmit={handleSubmit}>
+                        <Stack gap={6}>
+                            <Field.Root required>
+                                <Field.Label>Title</Field.Label>
 
-                        <Textarea
-                            id="content"
-                            value={content}
-                            onChange={(event) => setContent(event.target.value)}
-                            minLength={32}
-                            maxLength={8192}
-                            rows={14}
-                            resize="vertical"
-                            required
-                        />
-                    </Field.Root>
+                                <Input
+                                    type="text"
+                                    id="title"
+                                    placeholder="Ask something the forum can actually answer"
+                                    value={title}
+                                    onChange={(event) => setTitle(event.target.value)}
+                                    minLength={16}
+                                    maxLength={64}
+                                    required
+                                />
 
-                    <Stack direction="row" gap={3}>
-                        <Button type="submit" loading={loading} loadingText="Creating...">
-                            Create Post
-                        </Button>
+                                <Field.HelperText>
+                                    <Text
+                                        as="span"
+                                        color={title.length < 16 ? 'red.500' : 'fg.muted'}
+                                    >
+                                        {title.length < 16
+                                            ? `${16 - title.length} more characters needed`
+                                            : 'Looks good'}
+                                    </Text>
+                                    {' · '}
+                                    {title.length}/64
+                                </Field.HelperText>
+                            </Field.Root>
 
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            disabled={loading}
-                            onClick={() => navigate('/posts')}
-                        >
-                            Cancel
-                        </Button>
-                    </Stack>
-                </Stack>
-            </form>
+                            <Field.Root required>
+                                <Field.Label>Content</Field.Label>
+
+                                <Textarea
+                                    id="content"
+                                    placeholder="Give some context, then ask your question. Posts that explain the reasoning behind them get better replies."
+                                    value={content}
+                                    onChange={(event) => setContent(event.target.value)}
+                                    minLength={32}
+                                    maxLength={8192}
+                                    rows={14}
+                                    resize="vertical"
+                                    required
+                                />
+
+                                <Field.HelperText>
+                                    <Text
+                                        as="span"
+                                        color={content.length < 32 ? 'red.500' : 'fg.muted'}
+                                    >
+                                        {content.length < 32
+                                            ? `${32 - content.length} more characters needed`
+                                            : 'Looks good'}
+                                    </Text>
+                                    {' · '}
+                                    {content.length}/8192
+                                </Field.HelperText>
+                            </Field.Root>
+
+
+                            <Stack direction="row" gap={3}>
+                                <Button type="submit" loading={loading} loadingText="Creating...">
+                                    Create Post
+                                </Button>
+
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    disabled={loading}
+                                    onClick={() => navigate('/posts')}
+                                >
+                                    Cancel
+                                </Button>
+                            </Stack>
+                        </Stack>
+                    </form>
+                </Card.Body>
+            </Card.Root>
         </Container>
     )
 }

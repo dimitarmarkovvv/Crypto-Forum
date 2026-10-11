@@ -19,6 +19,7 @@ import {
 } from "@chakra-ui/react";
 import { toaster } from '../components/ui/toast-store.js';
 import { Header } from '../components/ui/Header.jsx';
+import { LuPencil, LuTrash2 } from 'react-icons/lu';
 import DeletePostDialog from '../components/ui/DeletePostDialog.jsx';
 
 function PostsPage() {
@@ -166,12 +167,22 @@ function PostsPage() {
 
                             {post.author_id === user.id && (
                                 <HStack mt={4}>
-                                    <Button size="sm" disabled={profile.is_blocked} onClick={() => navigate(`/posts/${post.id}/edit`)}>
-                                        Edit
+                                    <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        disabled={profile?.is_blocked}
+                                        onClick={() => navigate(`/posts/${post.id}/edit`)}
+                                    >
+                                        <LuPencil /> Edit
                                     </Button>
 
-                                    <Button size="sm" colorPalette="red" onClick={() => setPostToDelete(post.id)}>
-                                        Delete
+                                    <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        colorPalette="red"
+                                        onClick={() => setPostToDelete(post.id)}
+                                    >
+                                        <LuTrash2 /> Delete
                                     </Button>
                                 </HStack>
                             )}
