@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { createPost } from '../services/posts';
 import { Button, Container, Field, Heading, Input, Stack, Textarea, Alert} from '@chakra-ui/react';
 import { toaster } from '../components/ui/toast-store.js';
+import { Header } from '../components/ui/Header.jsx';
 
 function CreatePostPage() {
     const { user, profile } = useAuth();
@@ -16,8 +17,10 @@ function CreatePostPage() {
 
     if (profile?.is_blocked) {
         return (
-            <Container maxW="2x1" py={10}>
-                <Alert.Root status="error">
+            <Container maxW="4xl" py={10}>
+                <Header />
+
+                <Alert.Root mt={8} status="error">
                     <Alert.Indicator />
 
                     <Alert.Content>
@@ -76,8 +79,10 @@ function CreatePostPage() {
     };
 
     return (
-        <Container maxW="2xl" py={10}>
-            <Heading mb={6}>Create Post</Heading>
+        <Container maxW="4xl" py={10}>
+            <Header />
+
+            <Heading mt={8} mb={6}>Create Post</Heading>
 
             <form onSubmit={handleSubmit}>
                 <Stack gap={4}>
@@ -103,13 +108,26 @@ function CreatePostPage() {
                             onChange={(event) => setContent(event.target.value)}
                             minLength={32}
                             maxLength={8192}
+                            rows={14}
+                            resize="vertical"
                             required
                         />
                     </Field.Root>
 
-                    <Button type="submit" loading={loading} loadingText="Creating...">
-                        Create Post
-                    </Button>
+                    <Stack direction="row" gap={3}>
+                        <Button type="submit" loading={loading} loadingText="Creating...">
+                            Create Post
+                        </Button>
+
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            disabled={loading}
+                            onClick={() => navigate('/posts')}
+                        >
+                            Cancel
+                        </Button>
+                    </Stack>
                 </Stack>
             </form>
         </Container>
