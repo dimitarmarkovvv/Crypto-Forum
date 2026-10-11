@@ -13,7 +13,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { logoutUser } from '../../services/auth';
 
 export function Header() {
-    const { user, profile } = useAuth();
+    const { user, profile } = useAuth() ?? {};
     const navigate = useNavigate();
     const { pathname } = useLocation();
 
@@ -75,13 +75,17 @@ export function Header() {
                 <Stack direction="row" align="center" gap="2">
                     <Text color="fg.muted">You are logged out</Text>
 
-                    <Button variant="ghost" size="sm" onClick={() => navigate('/login')}>
-                        <LuLogIn /> Login
-                    </Button>
+                    {pathname !== '/login' && (
+                        <Button variant="ghost" size="sm" onClick={() => navigate('/login')}>
+                            <LuLogIn /> Login
+                        </Button>
+                    )}
 
-                    <Button size="sm" onClick={() => navigate('/register')}>
-                        <LuUserPlus /> Register
-                    </Button>
+                    {pathname !== '/register' && (
+                        <Button size="sm" onClick={() => navigate('/register')}>
+                            <LuUserPlus /> Register
+                        </Button>
+                    )}
                 </Stack>
             )}
         </Flex>

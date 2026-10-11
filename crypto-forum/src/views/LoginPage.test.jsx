@@ -23,7 +23,7 @@ vi.mock('react-router-dom', async (importOriginal) => {
 const renderLoginPage = () => {
     render(
         <ChakraProvider value={defaultSystem}>
-            <MemoryRouter>
+            <MemoryRouter initialEntries={['/login']}>
                 <LoginPage />
             </MemoryRouter>
         </ChakraProvider>
