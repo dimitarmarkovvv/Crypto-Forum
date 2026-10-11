@@ -22,3 +22,32 @@ $$;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
+
+
+-- Keep updated_at honest: the column defaults to now() on insert, but
+-- nothing moved it afterwards, so an edited row still reported its
+-- creation time.
+
+create or replace function public.touch_updated_at()
+returns trigger
+language plpgsql
+set search_path = ''
+as $$
+begin
+  new.updated_at = now();
+
+  return new;
+end;
+$$;
+
+drop trigger if exists posts_set_updated_at on public.posts;
+
+create trigger posts_set_updated_at
+  before update on public.posts
+  for each row execute function public.touch_updated_at();
+
+drop trigger if exists comments_set_updated_at on public.comments;
+
+create trigger comments_set_updated_at
+  before update on public.comments
+  for each row execute function public.touch_updated_at();
