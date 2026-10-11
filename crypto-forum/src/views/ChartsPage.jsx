@@ -10,13 +10,15 @@ import {
     NativeSelect,
     SimpleGrid,
     Spinner,
+    Stack,
     Text,
 } from '@chakra-ui/react';
 import { Header } from '../components/ui/Header.jsx';
 import PriceChart from '../components/ui/PriceChart.jsx';
+import CoinIcon from '../components/ui/CoinIcon.jsx';
 import { useCryptoPrices } from '../hooks/useCryptoPrices.js';
 import { useCryptoHistory } from '../hooks/useCryptoHistory.js';
-import { COINS, formatPrice } from '../constants/coins.js';
+import { CATEGORIES, COINS, formatPrice } from '../constants/coins.js';
 
 const RANGES = [
     { value: '1h:24', label: 'Last 24 hours' },
@@ -24,7 +26,7 @@ const RANGES = [
     { value: '1m:60', label: 'Last hour' },
 ];
 
-function CoinCard({ symbol, name, points, live }) {
+function CoinCard({ symbol, name, brandColor, points, live }) {
     const isUp = live ? live.change >= 0 : true;
     const color = isUp ? 'green.400' : 'red.400';
 
@@ -36,13 +38,17 @@ function CoinCard({ symbol, name, points, live }) {
         <Card.Root as="article">
             <Card.Body>
                 <Flex justify="space-between" align="start" mb={4}>
-                    <Box>
-                        <Heading size="md">{symbol.replace('USDT', '')}</Heading>
+                    <Flex align="center" gap="3">
+                        <CoinIcon symbol={symbol} color={brandColor} />
 
-                        <Text fontSize="sm" color="fg.muted">
-                            {name}
-                        </Text>
-                    </Box>
+                        <Box>
+                            <Heading size="md">{symbol.replace('USDT', '')}</Heading>
+
+                            <Text fontSize="sm" color="fg.muted">
+                                {name}
+                            </Text>
+                        </Box>
+                    </Flex>
 
                     <Box textAlign="right">
                         <Text fontSize="xl" fontWeight="bold">
@@ -76,11 +82,6 @@ function ChartsPage() {
 
             <Flex justify="space-between" align="center" mt={8} mb={6} gap="4">
                 <Flex align="center" gap="3">
-                    <Heading>Charts</Heading>
-
-                    <Badge colorPalette="green" variant="outline" borderRadius="full" px="3" size="sm">
-                        ● LIVE
-                    </Badge>
                 </Flex>
 
                 <NativeSelect.Root size="sm" maxW="180px">
@@ -103,17 +104,36 @@ function ChartsPage() {
                     <Spinner size="lg" />
                 </Center>
             ) : (
-                <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap="6">
-                    {COINS.map(({ symbol, name }) => (
-                        <CoinCard
-                            key={symbol}
-                            symbol={symbol}
-                            name={name}
-                            points={history[symbol] ?? []}
-                            live={prices[symbol]}
-                        />
+                <Stack gap="10">
+                    {CATEGORIES.map(({ id, label }) => (
+                        <Box key={id} as="section">
+                            <Heading
+                                size="sm"
+                                textTransform="uppercase"
+                                letterSpacing="wider"
+                                color="fg.muted"
+                                mb="4"
+                            >
+                                {label}
+                            </Heading>
+
+                            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap="6">
+                                {COINS.filter((coin) => coin.category === id).map(
+                                    ({ symbol, name, color }) => (
+                                        <CoinCard
+                                            key={symbol}
+                                            symbol={symbol}
+                                            name={name}
+                                            brandColor={color}
+                                            points={history[symbol] ?? []}
+                                            live={prices[symbol]}
+                                        />
+                                    )
+                                )}
+                            </SimpleGrid>
+                        </Box>
                     ))}
-                </SimpleGrid>
+                </Stack>
             )}
         </Container>
     );

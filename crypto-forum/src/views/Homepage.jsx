@@ -3,7 +3,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getForumStats, getMostCommentedPosts, getRecentPosts } from '../services/homepage';
 import { formatDate } from '../utils/formatDate.js'
-import { Badge, Box, Card, Center, Container, Flex, Grid, Heading, SimpleGrid, Spinner, Stack, Text, Link } from '@chakra-ui/react';
+import { Box, Card, Center, Container, Flex, Grid, Heading, SimpleGrid, Spinner, Stack, Text, Link } from '@chakra-ui/react';
 import { CryptoTicker } from '../components/ui/CryptoTicker.jsx';
 import { Header } from '../components/ui/Header.jsx';
 import { LuNewspaper, LuUsers, LuMessageSquare, LuChartNoAxesColumn } from 'react-icons/lu';
@@ -71,10 +71,6 @@ function HomePage() {
                                         Live statistics
                                     </Heading>
                                 </Flex>
-
-                                <Badge colorPalette="green" variant="outline" borderRadius="full" px="3" size="sm">
-                                    ● LIVE
-                                </Badge>
                             </Flex>
                         </Card.Header>
 

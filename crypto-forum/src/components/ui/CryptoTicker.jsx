@@ -1,46 +1,45 @@
 import { Box, Flex, Text } from '@chakra-ui/react';
 import { useCryptoPrices } from '../../hooks/useCryptoPrices.js';
+import { COINS, formatPrice } from '../../constants/coins.js';
+import CoinIcon from './CoinIcon.jsx';
 
-const formatPrice = (price) => {
-    const decimals = price >= 1000 ? 2 : price >= 1 ? 3 : 5;
-
-    return price.toLocaleString('en-US', {
-        minimumFractionDigits: decimals,
-        maximumFractionDigits: decimals,
-    });
-};
-
-function TickerCard({ symbol, price, change }) {
+function TickerCard({ symbol, color, price, change }) {
     const isUp = change >= 0;
 
     return (
-        <Box
+        <Flex
+            align="center"
+            gap="3"
             flexShrink={0}
             mr="4"
-            minW="170px"
+            minW="190px"
             borderWidth="1px"
             borderRadius="lg"
             px="4"
             py="2"
         >
-            <Text fontSize="xs" fontWeight="bold" letterSpacing="wide">
-                {symbol.replace('USDT', '')}
-            </Text>
+            <CoinIcon symbol={symbol} color={color} size="8" />
 
-            <Text fontSize="lg" fontWeight="semibold">
-                ${formatPrice(price)}
-            </Text>
+            <Box>
+                <Text fontSize="xs" fontWeight="bold" letterSpacing="wide">
+                    {symbol.replace('USDT', '')}
+                </Text>
 
-            <Text fontSize="sm" color={isUp ? 'green.500' : 'red.500'}>
-                {isUp ? '▲' : '▼'} {Math.abs(change).toFixed(2)}%
-            </Text>
-        </Box>
+                <Text fontSize="md" fontWeight="semibold">
+                    ${formatPrice(price)}
+                </Text>
+
+                <Text fontSize="xs" color={isUp ? 'green.500' : 'red.500'}>
+                    {isUp ? '▲' : '▼'} {Math.abs(change).toFixed(2)}%
+                </Text>
+            </Box>
+        </Flex>
     );
 }
 
 export function CryptoTicker() {
     const prices = useCryptoPrices();
-    const coins = Object.entries(prices);
+    const coins = COINS.filter(({ symbol }) => prices[symbol]);
 
     if (coins.length === 0) {
         return null;
@@ -53,12 +52,13 @@ export function CryptoTicker() {
                 animation="ticker-scroll 40s linear infinite"
                 _hover={{ animationPlayState: 'paused' }}
             >
-                {[...coins, ...coins].map(([symbol, data], index) => (
+                {[...coins, ...coins].map(({ symbol, color }, index) => (
                     <TickerCard
                         key={index}
                         symbol={symbol}
-                        price={data.price}
-                        change={data.change}
+                        color={color}
+                        price={prices[symbol].price}
+                        change={prices[symbol].change}
                     />
                 ))}
             </Flex>
