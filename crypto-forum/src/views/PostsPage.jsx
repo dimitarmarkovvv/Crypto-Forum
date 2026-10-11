@@ -24,6 +24,7 @@ import DeletePostDialog from '../components/ui/DeletePostDialog.jsx';
 
 function PostsPage() {
     const { user, profile } = useAuth();
+    const isAdmin = profile?.role === 'admin';
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
@@ -165,7 +166,7 @@ function PostsPage() {
                                 {post.commentCount} {post.commentCount === 1 ? 'comment' : 'comments'}
                             </Text>
 
-                            {post.author_id === user.id && (
+                            {(post.author_id === user.id || isAdmin) && (
                                 <HStack mt={4}>
                                     <Button
                                         size="sm"

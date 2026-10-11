@@ -23,6 +23,7 @@ function PostDetailsPage() {
     const { id } = useParams();
     const [pageLoading, setPageLoading] = useState(true);
     const { user, profile } = useAuth();
+    const isAdmin = profile?.role === 'admin';
     const [score, setScore] = useState(0);
     const [userVote, setUserVote] = useState(0);
     const [sort, setSort] = useState('newest');
@@ -183,7 +184,7 @@ function PostDetailsPage() {
 
                     <Spacer />
 
-                    {post.author_id === user.id && (
+                    {(post.author_id === user.id || isAdmin) && (
                         <HStack gap={2}>
                             <Button
                                 size="sm"
@@ -246,6 +247,7 @@ function PostDetailsPage() {
                             key={comment.id}
                             comment={comment}
                             userId={user.id}
+                            isAdmin={isAdmin}
                             isBlocked={profile?.is_blocked}
                             commentVotes={commentVotes}
 

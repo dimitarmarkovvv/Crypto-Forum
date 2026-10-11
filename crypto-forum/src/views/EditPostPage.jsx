@@ -15,6 +15,7 @@ function EditPostPage() {
     const { id } = useParams();
     const [pageLoading, setPageLoading] = useState(true);
     const { user, profile } = useAuth();
+    const isAdmin = profile?.role === 'admin';
 
     useEffect(() => {
         const loadPost = async () => {
@@ -23,7 +24,7 @@ function EditPostPage() {
             try {
                 const post = await getPostById(id);
 
-                if (post.author_id !== user.id) {
+                if (post.author_id !== user.id && !isAdmin) {
                     toaster.create({
                         id: 'unauthorized-edit-post',
                         title: 'You can only edit your own posts',
@@ -44,7 +45,7 @@ function EditPostPage() {
         };
 
         loadPost();
-    }, [id, user.id, profile?.is_blocked, navigate]);
+    }, [id, user.id, isAdmin, profile?.is_blocked, navigate]);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
