@@ -1,12 +1,12 @@
 import { useAuth } from '../hooks/useAuth';
-import { logoutUser } from '../services/auth';
-import { useNavigate, Link as RouterLink} from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getForumStats, getMostCommentedPosts, getRecentPosts } from '../services/homepage';
 import { formatDate } from '../utils/formatDate.js'
-import { Badge, Box, Button, Card, Center, Container, Flex, Grid, Heading, SimpleGrid, Spinner, Stack, Text, Link } from '@chakra-ui/react';
+import { Badge, Box, Card, Center, Container, Flex, Grid, Heading, SimpleGrid, Spinner, Stack, Text, Link } from '@chakra-ui/react';
 import { CryptoTicker } from '../components/ui/CryptoTicker.jsx';
-import { LuNewspaper, LuUsers, LuShield, LuLogOut, LuLogIn, LuUserPlus, LuMessageSquare, LuChartNoAxesColumn } from 'react-icons/lu';
+import { Header } from '../components/ui/Header.jsx';
+import { LuNewspaper, LuUsers, LuMessageSquare, LuChartNoAxesColumn } from 'react-icons/lu';
 
 function StatRow({ icon, color, label, value }) {
     return (
@@ -24,20 +24,11 @@ function StatRow({ icon, color, label, value }) {
 }
 
 function HomePage() {
-    const { user, profile, loading } = useAuth();
+    const { loading } = useAuth();
     const [stats, setStats] = useState(null);
     const [posts, setPosts] = useState([]);
     const [comments, setComments] = useState([]);
-    const navigate = useNavigate();
 
-    const handleLogout = async (userId) => {
-        try {
-            await logoutUser(userId);
-            navigate('/login')
-        } catch (error) {
-            console.error(error.message);
-        };
-    };
 
     useEffect(() => {
         const loadHomePageData = async () => {
@@ -63,51 +54,7 @@ function HomePage() {
 
     return (
         <Container maxW="6xl" py={10}>
-            <Flex
-                as="header"
-                justify="space-between"
-                align="center"
-                gap="4"
-                pb="4"
-                mb="2"
-                borderBottomWidth="1px"
-            >
-                <Heading>LearnCrypto</Heading>
-
-                {user ? (
-                    <Stack direction="row" align="center" gap="1">
-                        <Button variant="ghost" size="sm" onClick={() => navigate('/posts')}>
-                            <LuNewspaper /> Posts
-                        </Button>
-
-                        <Button variant="ghost" size="sm" onClick={() => navigate('/users/search')}>
-                            <LuUsers /> Search Users
-                        </Button>
-
-                        {profile?.role === 'admin' && (
-                            <Button variant="ghost" size="sm" onClick={() => navigate('/admin')}>
-                                <LuShield /> Admin Dashboard
-                            </Button>
-                        )}
-
-                        <Button variant="ghost" size="sm" onClick={() => handleLogout(user.id)}>
-                            <LuLogOut /> Logout
-                        </Button>
-                    </Stack>
-                ) : (
-                    <Stack direction="row" align="center" gap="2">
-                        <Text color="fg.muted">You are logged out</Text>
-
-                        <Button variant="ghost" size="sm" onClick={() => navigate('/login')}>
-                            <LuLogIn /> Login
-                        </Button>
-
-                        <Button size="sm" onClick={() => navigate('/register')}>
-                            <LuUserPlus /> Register
-                        </Button>
-                    </Stack>
-                )}
-            </Flex>
+            <Header />
 
             <Grid templateColumns={{ base: "1fr", md: "1fr 2fr" }} gap="6" mt={8}>
                 {stats && (

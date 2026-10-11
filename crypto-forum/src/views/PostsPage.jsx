@@ -18,6 +18,7 @@ import {
     Text,
 } from "@chakra-ui/react";
 import { toaster } from '../components/ui/toast-store.js';
+import { Header } from '../components/ui/Header.jsx';
 
 function PostsPage() {
     const { user, profile } = useAuth();
@@ -84,7 +85,9 @@ function PostsPage() {
 
 
     return (
-        <Container maxW="3xl" py={10}>
+        <Container maxW="6xl" py={10}>
+            <Header />
+
             <HStack justify="space-between" mb={6}>
                 <Heading>Posts</Heading>
 
