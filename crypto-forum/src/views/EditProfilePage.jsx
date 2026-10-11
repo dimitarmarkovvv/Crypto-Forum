@@ -88,9 +88,20 @@ function EditProfilePage() {
                         <input type="file" accept="image/*" onChange={(e) => setAvatarFile(e.target.files[0])} />
                     </Field.Root>
 
-                    <Button type="submit" loading={loading} loadingText="Saving...">
-                        Save changes
-                    </Button>
+                    <Stack direction="row" gap={3}>
+                        <Button type="submit" loading={loading} loadingText="Saving...">
+                            Save changes
+                        </Button>
+
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            disabled={loading}
+                            onClick={() => navigate(`/users/${user.id}`)}
+                        >
+                            Cancel
+                        </Button>
+                    </Stack>
                 </Stack>
             </form>
         </Container>
