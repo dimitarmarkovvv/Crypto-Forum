@@ -40,7 +40,16 @@ with check (
 create policy "Users can delete their own posts"
 on public.posts
 for delete
-using (author_id = auth.uid());
+to authenticated
+using (
+    author_id = auth.uid()
+    and exists (
+        select 1
+        from public.profiles
+        where id = auth.uid()
+        and is_blocked = false
+    )
+);
 
 create policy "Admins can delete any post"
 on public.posts
@@ -100,7 +109,15 @@ create policy "Users can delete their own comments"
 on public.comments
 for delete
 to authenticated
-using (author_id = auth.uid());
+using (
+    author_id = auth.uid()
+    and exists (
+        select 1
+        from public.profiles
+        where id = auth.uid()
+        and is_blocked = false
+    )
+);
 
 -- Post votes
 alter table public.post_votes enable row level security;
