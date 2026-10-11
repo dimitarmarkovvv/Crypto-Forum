@@ -22,6 +22,7 @@ import {
 import { getForumStats } from '../services/homepage.js';
 import { toaster } from '../components/ui/toast-store.js';
 import BlockUserDialog from '../components/ui/admin/BlockUserDialog.jsx';
+import { Header } from '../components/ui/Header.jsx';
 
 
 function AdminDashboardPage() {
@@ -123,6 +124,8 @@ function AdminDashboardPage() {
 
     return (
         <Container maxW="7xl" py={10}>
+            <Header />
+
             <Stack gap={10}>
                 <Box>
                     <Heading size="2xl">
