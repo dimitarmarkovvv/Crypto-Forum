@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react';
+import { COINS } from '../constants/coins.js';
 
 export function useCryptoPrices() {
     const [prices, setPrices] = useState({});
 
     useEffect(() => {
+        const streams = COINS
+            .map(({ symbol }) => `${symbol.toLowerCase()}@ticker`)
+            .join('/');
+
         const ws = new WebSocket(
-            'wss://stream.binance.com:9443/stream?streams=' +
-            'btcusdt@ticker/ethusdt@ticker/solusdt@ticker/xrpusdt@ticker/bnbusdt@ticker/adausdt@ticker'
+            `wss://stream.binance.com:9443/stream?streams=${streams}`
         );
 
 

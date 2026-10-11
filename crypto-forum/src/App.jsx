@@ -4,6 +4,7 @@ import HomePage from './views/Homepage.jsx';
 import { RegisterPage } from './views/RegisterPage';
 import { ProtectedRoute } from './routes/ProtectedRoute.jsx'
 import PostsPage from './views/PostsPage.jsx';
+import ChartsPage from './views/ChartsPage.jsx';
 import CreatePostPage from './views/CreatePostPage.jsx';
 import EditPostPage from './views/EditPostPage.jsx';
 import PostDetailsPage from './views/PostDetailsPage.jsx';
@@ -87,6 +88,7 @@ function App() {
 
         <Route element={<ProtectedRoute />}>
           <Route path='/posts' element={<PostsPage />} />
+          <Route path='/charts' element={<ChartsPage />} />
           <Route path='/posts/create' element={<CreatePostPage />} />
           <Route path='/posts/:id/edit' element={<EditPostPage />} />
           <Route path='/posts/:id' element={<PostDetailsPage />} />

@@ -2,6 +2,7 @@ import { Button, Flex, Heading, Stack, Text } from '@chakra-ui/react';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import {
     LuNewspaper,
+    LuChartLine,
     LuUsers,
     LuShield,
     LuLogOut,
@@ -50,6 +51,10 @@ export function Header() {
                 <Stack direction="row" align="center" gap="1">
                     <Button variant="ghost" size="sm" onClick={() => navigate('/posts')}>
                         <LuNewspaper /> Posts
+                    </Button>
+
+                    <Button variant="ghost" size="sm" onClick={() => navigate('/charts')}>
+                        <LuChartLine /> Charts
                     </Button>
 
                     <Button variant="ghost" size="sm" onClick={() => navigate('/users/search')}>
