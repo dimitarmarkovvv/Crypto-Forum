@@ -4,6 +4,7 @@ import { Button, Card, Container, Field, Heading, Input, Stack } from '@chakra-u
 import { registerUser } from '../services/auth';
 import { toaster } from '../components/ui/toast-store.js';
 import { Header } from '../components/ui/Header.jsx';
+import PasswordInput from '../components/ui/PasswordInput.jsx';
 
 export function RegisterPage() {
     const [email, setEmail] = useState('');
@@ -83,8 +84,7 @@ export function RegisterPage() {
 
                         <Field.Root required>
                             <Field.Label>Password</Field.Label>
-                            <Input
-                                type='password'
+                            <PasswordInput
                                 value={password}
                                 onChange={(event) => setPassword(event.target.value)}
                                 required

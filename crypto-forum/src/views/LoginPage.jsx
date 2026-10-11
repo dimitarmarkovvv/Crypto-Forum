@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Button, Card, Container, Field, Heading, Input, Stack } from '@chakra-ui/react';
+import { useNavigate, useLocation, Link as RouterLink } from 'react-router-dom';
+import { Button, Card, Container, Field, Heading, Input, Link, Stack } from '@chakra-ui/react';
 import { loginUser } from '../services/auth';
 import { toaster } from '../components/ui/toast-store.js';
 import { Header } from '../components/ui/Header.jsx';
+import PasswordInput from '../components/ui/PasswordInput.jsx';
 
 export function LoginPage() {
     const [email, setEmail] = useState('')
@@ -31,6 +32,7 @@ export function LoginPage() {
         }
     }
 
+
     return (
         <Container maxW="6xl" py={10}>
             <Header />
@@ -53,13 +55,18 @@ export function LoginPage() {
 
                         <Field.Root required>
                             <Field.Label>Password</Field.Label>
-                            <Input
-                                type='password'
+                            <PasswordInput
                                 value={password}
                                 onChange={(event) => setPassword(event.target.value)}
                                 required
                             />
                         </Field.Root>
+
+                        <Link asChild fontSize="sm" alignSelf="flex-end">
+                            <RouterLink to="/forgot-password">
+                                Forgot password?
+                            </RouterLink>
+                        </Link>
 
                         <Button type='submit' loading={isLoading} loadingText='Logging in...'>
                             Login

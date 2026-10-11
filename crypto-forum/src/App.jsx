@@ -1,7 +1,9 @@
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { LoginPage } from './views/LoginPage';
 import HomePage from './views/Homepage.jsx';
 import { RegisterPage } from './views/RegisterPage';
+import { ForgotPasswordPage } from './views/ForgotPasswordPage.jsx';
+import { ResetPasswordPage } from './views/ResetPasswordPage.jsx';
 import { ProtectedRoute } from './routes/ProtectedRoute.jsx'
 import PostsPage from './views/PostsPage.jsx';
 import ChartsPage from './views/ChartsPage.jsx';
@@ -17,9 +19,7 @@ import { useAuth } from './hooks/useAuth.js';
 import BlockedAccountDialog from './components/ui/BlockedAccountDialog.jsx';
 import { useState } from 'react';
 import BlockedAccountBanner from './components/ui/BlockedUserBanner.jsx';
-import { ColorModeButton } from './components/ui/color-mode.jsx';
-import { Box, Stack, Avatar } from '@chakra-ui/react';
-import { getAvatarUrl } from './services/profiles.js';
+import { FloatingControls } from './components/ui/FloatingControls.jsx';
 
 function App() {
   const { user, profile } = useAuth();
@@ -54,27 +54,7 @@ function App() {
         <BlockedAccountBanner />
       )}
 
-      <Box position="fixed" top="4" right="4" zIndex="sticky">
-        <Stack direction="row" align="center" gap="3">
-          <ColorModeButton />
-
-          {user && profile && (
-            <Link to={`/users/${user.id}`}>
-              <Avatar.Root w="40px" h="40px" borderRadius="full" overflow="hidden">
-                <Avatar.Fallback
-                  name={`${profile.first_name} ${profile.last_name}`}
-                />
-                {profile.avatar_url && (
-                  <Avatar.Image
-                    src={getAvatarUrl(profile.avatar_url)}
-                    alt={`${profile.username}'s avatar`}
-                  />
-                )}
-              </Avatar.Root>
-            </Link>
-          )}
-        </Stack>
-      </Box>
+      <FloatingControls />
 
       <BlockedAccountDialog
         open={blockedDialogOpen}
@@ -85,6 +65,8 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path='/register' element={<RegisterPage />} />
+        <Route path='/forgot-password' element={<ForgotPasswordPage />} />
+        <Route path='/reset-password' element={<ResetPasswordPage />} />
 
         <Route element={<ProtectedRoute />}>
           <Route path='/posts' element={<PostsPage />} />
