@@ -6,7 +6,7 @@ import { getForumStats, getMostCommentedPosts, getRecentPosts } from '../service
 import { formatDate } from '../utils/formatDate.js'
 import { Box, Button, Card, Center, Container, Flex, Heading, SimpleGrid, Spinner, Stack, Text, Link } from '@chakra-ui/react';
 import { CryptoTicker } from '../components/ui/CryptoTicker.jsx';
-import { LuNewspaper, LuUsers, LuShield, LuLogOut } from 'react-icons/lu';
+import { LuNewspaper, LuUsers, LuShield, LuLogOut, LuLogIn, LuUserPlus } from 'react-icons/lu';
 
 function HomePage() {
     const { user, profile, loading } = useAuth();
@@ -80,7 +80,17 @@ function HomePage() {
                         </Button>
                     </Stack>
                 ) : (
-                    <Text color="fg.muted">You are logged out</Text>
+                    <Stack direction="row" align="center" gap="2">
+                        <Text color="fg.muted">You are logged out</Text>
+
+                        <Button variant="ghost" size="sm" onClick={() => navigate('/login')}>
+                            <LuLogIn /> Login
+                        </Button>
+
+                        <Button size="sm" onClick={() => navigate('/register')}>
+                            <LuUserPlus /> Register
+                        </Button>
+                    </Stack>
                 )}
             </Flex>
 
