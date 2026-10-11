@@ -3,7 +3,7 @@ import { supabase } from "../supabase/supabaseClient"
 export const getCommentsByPostId = async (postId, sort = 'newest') => {
     const { data, error } = await supabase
         .from('comments')
-        .select('*, profiles(username)')
+        .select('*, profiles(username, avatar_url)')
         .eq('post_id', postId)
         .order('created_at', { ascending: sort === 'oldest' });
 
@@ -25,7 +25,7 @@ export const createComment = async (content, postId, authorId, parentCommentId =
             author_id: authorId,
             parent_comment_id: parentCommentId,
         })
-        .select('*, profiles(username)')
+        .select('*, profiles(username, avatar_url)')
         .single()
 
     if (error) {
@@ -44,7 +44,7 @@ export const updateComment = async (commentId, content) => {
             content: cleanContent
         })
         .eq('id', commentId)
-        .select('*, profiles(username)')
+        .select('*, profiles(username, avatar_url)')
         .single();
 
     if (error) {
@@ -79,7 +79,7 @@ export const deleteComment = async (commentId) => {
                 deleted_at: new Date().toISOString(),
             })
             .eq('id', commentId)
-            .select('*, profiles(username)')
+            .select('*, profiles(username, avatar_url)')
             .single();
 
         if (error) {

@@ -1,16 +1,19 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link as RouterLink } from "react-router-dom";
+import { LuPencil, LuTrash2, LuMessageSquare } from 'react-icons/lu';
 import { useParams } from "react-router-dom";
 import { deletePost, getPostById } from "../services/posts";
 import { useEffect, useState } from "react";
-import { Button, Center, Container, Heading, Spinner, HStack, Text, Stack, Textarea, Box, NativeSelect } from '@chakra-ui/react';
+import { Button, Card, Center, Container, Flex, Heading, IconButton, Spacer, Spinner, HStack, Text, Stack, Textarea, Box, NativeSelect, Link } from '@chakra-ui/react';
 import { toaster } from '../components/ui/toast-store.js';
 import { formatDate } from "../utils/formatDate.js";
 import { useAuth } from "../hooks/useAuth.js";
+import { Header } from '../components/ui/Header.jsx';
 import { getCommentsByPostId } from "../services/comments.js";
 import { castVote, getPostVotes, removeVote, } from "../services/votes.js";
 import { buildCommentTree } from '../utils/buildCommentTree.js';
 import Comment from '../components/ui/comments/Comment.jsx'
 import DeleteCommentDialog from '../components/ui/comments/DeleteCommentDialog.jsx';
+import DeletePostDialog from '../components/ui/DeletePostDialog.jsx';
 import { useComments } from '../hooks/useComments.js';
 import { useCommentVotes } from '../hooks/useCommentVotes.js';
 
@@ -23,6 +26,8 @@ function PostDetailsPage() {
     const [score, setScore] = useState(0);
     const [userVote, setUserVote] = useState(0);
     const [sort, setSort] = useState('newest');
+    const [deleteOpen, setDeleteOpen] = useState(false);
+    const [deleting, setDeleting] = useState(false);
 
     const {
         comments,
@@ -68,11 +73,16 @@ function PostDetailsPage() {
 
 
     const handleDelete = async () => {
+        setDeleting(true);
+
         try {
             await deletePost(id);
             navigate('/posts');
         } catch (error) {
             toaster.create({ title: error.message, type: 'error' });
+            setDeleteOpen(false);
+        } finally {
+            setDeleting(false);
         };
     };
 
@@ -123,69 +133,109 @@ function PostDetailsPage() {
     };
 
     return (
-        <Container maxW="3xl" py={10}>
-            <Heading mb={6}>{post.title}</Heading>
+        <Container maxW="4xl" py={10}>
+            <Header />
 
-            <Text mb={4} color="fg.muted">
-                by{' '}
-                <Text
-                    as="span"
-                    cursor="pointer"
-                    _hover={{ textDecoration: 'underline' }}
-                    onClick={() => navigate(`/users/${post.author_id}`)}
-                >
-                    {post.profiles.username}
-                </Text>
-                {' — '}
-                {formatDate(post.created_at)}
-            </Text>
+            <Card.Root as="article" mt={8}>
+                <Card.Body>
+                    <Heading mb={3}>{post.title}</Heading>
 
-            <Text mb={6}>{post.content}</Text>
+                    <Text mb={5} color="fg.muted" fontSize="sm">
+                        by{' '}
+                        <Link asChild color="inherit">
+                            <RouterLink to={`/users/${post.author_id}`}>
+                                {post.profiles.username}
+                            </RouterLink>
+                        </Link>
+                        {' · '}
+                        {formatDate(post.created_at)}
+                    </Text>
 
-            <HStack mb={4}>
-                <Button
-                    size="sm"
-                    colorPalette={userVote === 1 ? 'green' : 'gray'}
-                    onClick={() => handleVoteValue(1)}
-                >
-                    ▲
-                </Button>
+                    <Text whiteSpace="pre-wrap">{post.content}</Text>
+                </Card.Body>
 
-                <Text fontWeight="bold">{score}</Text>
+                <Card.Footer borderTopWidth="1px" pt="4">
+                    <HStack gap={1}>
+                        <IconButton
+                            aria-label="Upvote"
+                            size="sm"
+                            variant={userVote === 1 ? 'subtle' : 'ghost'}
+                            colorPalette={userVote === 1 ? 'green' : 'gray'}
+                            onClick={() => handleVoteValue(1)}
+                        >
+                            ▲
+                        </IconButton>
 
-                <Button
-                    size="sm"
-                    colorPalette={userVote === -1 ? 'red' : 'gray'}
-                    onClick={() => handleVoteValue(-1)}
-                >
-                    ▼
-                </Button>
-            </HStack>
+                        <Text fontWeight="bold" minW="8" textAlign="center">
+                            {score}
+                        </Text>
 
-            {post.author_id === user.id && (
-                <HStack>
-                    <Button size="sm" disabled={profile.is_blocked} onClick={() => navigate(`/posts/${id}/edit`)}>
-                        Edit
-                    </Button>
+                        <IconButton
+                            aria-label="Downvote"
+                            size="sm"
+                            variant={userVote === -1 ? 'subtle' : 'ghost'}
+                            colorPalette={userVote === -1 ? 'red' : 'gray'}
+                            onClick={() => handleVoteValue(-1)}
+                        >
+                            ▼
+                        </IconButton>
+                    </HStack>
 
-                    <Button size="sm" colorPalette="red" onClick={handleDelete}>
-                        Delete
-                    </Button>
-                </HStack>
-            )}
+                    <Spacer />
 
-            <NativeSelect.Root maxW="200px" mb={4}>
-                <NativeSelect.Field
-                    value={sort}
-                    onChange={(event) => setSort(event.target.value)}
-                >
-                    <option value="newest">Newest</option>
-                    <option value="oldest">Oldest</option>
-                </NativeSelect.Field>
-                <NativeSelect.Indicator />
-            </NativeSelect.Root>
+                    {post.author_id === user.id && (
+                        <HStack gap={2}>
+                            <Button
+                                size="sm"
+                                variant="ghost"
+                                disabled={profile?.is_blocked}
+                                onClick={() => navigate(`/posts/${id}/edit`)}
+                            >
+                                <LuPencil /> Edit
+                            </Button>
 
-            <Heading size="md" mt={8} mb={4}>Comments</Heading>
+                            <Button
+                                size="sm"
+                                variant="ghost"
+                                colorPalette="red"
+                                onClick={() => setDeleteOpen(true)}
+                            >
+                                <LuTrash2 /> Delete
+                            </Button>
+                        </HStack>
+                    )}
+                </Card.Footer>
+            </Card.Root>
+
+            <Card.Root as="section" mt={8}>
+                <Card.Header borderBottomWidth="1px" py="4">
+                    <Flex justify="space-between" align="center" gap="4">
+                        <Flex align="center" gap={2}>
+                            <Box color="brand.400"><LuMessageSquare /></Box>
+
+                            <Heading size="sm" textTransform="uppercase" letterSpacing="wider">
+                                Comments
+                            </Heading>
+
+                            <Text color="fg.muted" fontSize="sm">
+                                ({commentTree.length})
+                            </Text>
+                        </Flex>
+
+                        <NativeSelect.Root size="sm" maxW="140px">
+                            <NativeSelect.Field
+                                value={sort}
+                                onChange={(event) => setSort(event.target.value)}
+                            >
+                                <option value="newest">Newest</option>
+                                <option value="oldest">Oldest</option>
+                            </NativeSelect.Field>
+                            <NativeSelect.Indicator />
+                        </NativeSelect.Root>
+                    </Flex>
+                </Card.Header>
+
+                <Card.Body>
 
             <Stack gap={4}>
                 {commentTree.length === 0 ? (
@@ -254,6 +304,15 @@ function PostDetailsPage() {
                     </Button>
                 </form>
             )}
+                </Card.Body>
+            </Card.Root>
+
+            <DeletePostDialog
+                open={deleteOpen}
+                setOpen={setDeleteOpen}
+                handleDeletePost={handleDelete}
+                loading={deleting}
+            />
 
             <DeleteCommentDialog
                 commentToDelete={commentToDelete}
