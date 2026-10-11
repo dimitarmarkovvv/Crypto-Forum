@@ -3,6 +3,7 @@ import { Box, Container, Heading, HStack, Input, Spinner, Stack, Text } from '@c
 import { toaster } from '../components/ui/toast-store.js';
 import { searchUsers, getAvatarUrl } from '../services/profiles.js';
 import { useNavigate } from 'react-router-dom';
+import { Header } from '../components/ui/Header.jsx';
 
 function UserSearchPage() {
     const [searchTerm, setSearchTerm] = useState('');
@@ -33,7 +34,9 @@ function UserSearchPage() {
 
 
     return (
-        <Container maxW="2xl" py={10}>
+        <Container maxW="6xl" py={10}>
+            <Header />
+
             <Heading mb={6}>Search Users</Heading>
 
             <Input
