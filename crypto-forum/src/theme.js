@@ -29,6 +29,15 @@ const config = defineConfig({
 
     semanticTokens: {
       colors: {
+        bg: {
+          DEFAULT: {
+            value: { _light: '{colors.gray.100}', _dark: '{colors.black}' },
+          },
+          subtle: {
+            value: { _light: '{colors.gray.200}', _dark: '{colors.gray.950}' },
+          },
+        },
+
         brand: {
           contrast: { value: { _light: 'white', _dark: 'white' } },
           fg: {
