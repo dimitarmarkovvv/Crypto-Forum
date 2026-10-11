@@ -2,6 +2,13 @@ import { createSystem, defaultConfig, defineConfig } from '@chakra-ui/react';
 
 const config = defineConfig({
   theme: {
+    keyframes: {
+      'ticker-scroll': {
+        '0%': { transform: 'translateX(0)' },
+        '100%': { transform: 'translateX(-50%)' },
+      },
+    },
+
     tokens: {
       colors: {
         brand: {
