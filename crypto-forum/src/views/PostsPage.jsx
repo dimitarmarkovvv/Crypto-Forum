@@ -2,12 +2,15 @@ import { useEffect, useState } from "react";
 import { deletePost, getPosts } from "../services/posts";
 import { formatDate } from "../utils/formatDate";
 import { useAuth } from '../hooks/useAuth';
+import { getAvatarUrl } from '../services/profiles';
 import { useNavigate, Link as RouterLink } from "react-router-dom";
 import {
+    Avatar,
     Box,
     Button,
     Center,
     Container,
+    Flex,
     Heading,
     HStack,
     Input,
@@ -152,16 +155,42 @@ function PostsPage() {
 
                             <Text mt={2}>{post.content}</Text>
 
-                            <Text mt={2} color="fg.muted">
-                                by{' '}
+                            <Flex align="center" gap={3} mt={2}>
                                 <Link asChild>
                                     <RouterLink to={`/users/${post.author_id}`}>
-                                        {post.profiles.username}
+                                        <Avatar.Root
+                                            size="sm"
+                                            borderRadius="full"
+                                            overflow="hidden"
+                                            flexShrink={0}
+                                        >
+                                            <Avatar.Fallback
+                                                name={post.profiles.username}
+                                            />
+
+                                            {post.profiles.avatar_url && (
+                                                <Avatar.Image
+                                                    src={getAvatarUrl(
+                                                        post.profiles.avatar_url
+                                                    )}
+                                                    alt={`${post.profiles.username}'s avatar`}
+                                                />
+                                            )}
+                                        </Avatar.Root>
                                     </RouterLink>
                                 </Link>
-                                {' - '}
-                                {formatDate(post.created_at)}
-                            </Text>
+
+                                <Text color="fg.muted">
+                                    by{' '}
+                                    <Link asChild>
+                                        <RouterLink to={`/users/${post.author_id}`}>
+                                            {post.profiles.username}
+                                        </RouterLink>
+                                    </Link>
+                                    {' - '}
+                                    {formatDate(post.created_at)}
+                                </Text>
+                            </Flex>
                             <Text mt={1} color="fg.muted" fontSize="sm">
                                 {post.commentCount} {post.commentCount === 1 ? 'comment' : 'comments'}
                             </Text>

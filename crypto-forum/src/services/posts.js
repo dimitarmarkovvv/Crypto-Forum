@@ -12,7 +12,7 @@ export const getPosts = async ({
 
   let query = supabase
     .from('posts')
-    .select('*, profiles(username), comments(count)')
+    .select('*, profiles(username, avatar_url), comments(count)')
 
   if (search.trim()) {
     query = query.ilike('title', `${search.trim()}%`)
