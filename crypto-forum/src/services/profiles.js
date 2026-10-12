@@ -1,11 +1,14 @@
 import { supabase } from "../supabase/supabaseClient";
 
+export const PROFILE_COLUMNS =
+    'id, username, first_name, last_name, role, is_blocked, created_at, avatar_url, location, signature, gender';
+
 export const updateProfile = async (userId, { first_name, last_name, location, signature, gender }) => {
     const { data, error } = await supabase
     .from('profiles')
     .update({first_name, last_name, location, signature, gender})
     .eq('id', userId)
-    .select()
+    .select(PROFILE_COLUMNS)
     .single();
 
     if(error){
@@ -34,7 +37,7 @@ export const uploadAvatar = async (userId, file, oldPath = null) => {
     .from('profiles')
     .update({ avatar_url: path })
     .eq('id', userId)
-    .select()
+    .select(PROFILE_COLUMNS)
     .single();
 
   if (error) {
