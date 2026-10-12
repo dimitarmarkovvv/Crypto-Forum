@@ -1,5 +1,7 @@
 # LearnCrypto
 
+**Live at <https://learn-crypto-five.vercel.app>**
+
 A discussion forum for cryptocurrency, built as a single-page React
 application on top of Supabase. Users register, write posts, hold
 threaded discussions, vote, and follow live market prices; administrators
@@ -110,11 +112,15 @@ touch their own avatar; reads are public so the images can be displayed.
 ### 3. Configure auth
 
 Under **Authentication → URL Configuration**, add the reset-password route
-to the redirect allow list:
+to the redirect allow list — one entry per environment you run:
 
 ```
 http://localhost:5173/reset-password
+https://<your-deployment>/reset-password
 ```
+
+The app builds the return address from `window.location.origin`, and
+Supabase rejects any address that is not on this list.
 
 Email confirmation can stay on or off for local development. The reset
 link lifetime is set under **Authentication → Emails**.
