@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Button, Center, Container, Field, Heading, Input, Spinner, Stack, Textarea, Box, Text } from '@chakra-ui/react';
 import { toaster } from '../components/ui/toast-store.js';
 import { useAuth } from "../hooks/useAuth.js";
+import { canModerate } from "../utils/roles.js";
 import { Header } from '../components/ui/Header.jsx';
 
 function EditPostPage() {
@@ -15,7 +16,7 @@ function EditPostPage() {
     const { id } = useParams();
     const [pageLoading, setPageLoading] = useState(true);
     const { user, profile } = useAuth();
-    const isAdmin = profile?.role === 'admin';
+    const isModerator = canModerate(profile);
 
     useEffect(() => {
         const loadPost = async () => {
@@ -24,7 +25,7 @@ function EditPostPage() {
             try {
                 const post = await getPostById(id);
 
-                if (post.author_id !== user.id && !isAdmin) {
+                if (post.author_id !== user.id && !isModerator) {
                     toaster.create({
                         id: 'unauthorized-edit-post',
                         title: 'You can only edit your own posts',
@@ -45,7 +46,7 @@ function EditPostPage() {
         };
 
         loadPost();
-    }, [id, user.id, isAdmin, profile?.is_blocked, navigate]);
+    }, [id, user.id, isModerator, profile?.is_blocked, navigate]);
 
     const handleSubmit = async (event) => {
         event.preventDefault();

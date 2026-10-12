@@ -51,7 +51,7 @@ using (
     )
 );
 
-create policy "Admins can update any post"
+create policy "Moderators can update any post"
 on public.posts
 for update
 to authenticated
@@ -60,7 +60,7 @@ using (
         select 1
         from public.profiles
         where id = auth.uid()
-          and role = 'admin'
+          and role in ('moderator', 'admin')
     )
 )
 with check (
@@ -68,11 +68,11 @@ with check (
         select 1
         from public.profiles
         where id = auth.uid()
-          and role = 'admin'
+          and role in ('moderator', 'admin')
     )
 );
 
-create policy "Admins can delete any post"
+create policy "Moderators can delete any post"
 on public.posts
 for delete
 to authenticated
@@ -81,7 +81,7 @@ using (
         select 1
         from public.profiles
         where id = auth.uid()
-          and role = 'admin'
+          and role in ('moderator', 'admin')
     )
 );
 
@@ -124,7 +124,7 @@ with check (
     )
 );
 
-create policy "Admins can update any comment"
+create policy "Moderators can update any comment"
 on public.comments
 for update
 to authenticated
@@ -133,7 +133,7 @@ using (
         select 1
         from public.profiles
         where id = auth.uid()
-          and role = 'admin'
+          and role in ('moderator', 'admin')
     )
 )
 with check (
@@ -141,13 +141,13 @@ with check (
         select 1
         from public.profiles
         where id = auth.uid()
-          and role = 'admin'
+          and role in ('moderator', 'admin')
     )
 );
 
 grant delete on public.comments to authenticated;
 
-create policy "Admins can delete any comment"
+create policy "Moderators can delete any comment"
 on public.comments
 for delete
 to authenticated
@@ -156,7 +156,7 @@ using (
         select 1
         from public.profiles
         where id = auth.uid()
-          and role = 'admin'
+          and role in ('moderator', 'admin')
     )
 );
 

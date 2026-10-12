@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { deletePost, getPosts } from "../services/posts";
 import { formatDate } from "../utils/formatDate";
 import { useAuth } from '../hooks/useAuth';
+import { canModerate } from '../utils/roles.js';
 import { getAvatarUrl } from '../services/profiles';
 import { useNavigate, Link as RouterLink } from "react-router-dom";
 import {
@@ -27,7 +28,7 @@ import DeletePostDialog from '../components/ui/DeletePostDialog.jsx';
 
 function PostsPage() {
     const { user, profile } = useAuth();
-    const isAdmin = profile?.role === 'admin';
+    const isModerator = canModerate(profile);
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
@@ -195,7 +196,7 @@ function PostsPage() {
                                 {post.commentCount} {post.commentCount === 1 ? 'comment' : 'comments'}
                             </Text>
 
-                            {(post.author_id === user.id || isAdmin) && (
+                            {(post.author_id === user.id || isModerator) && (
                                 <HStack mt={4}>
                                     <Button
                                         size="sm"

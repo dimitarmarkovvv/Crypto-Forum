@@ -72,7 +72,7 @@ describe('Comment permissions', () => {
     });
 
     it('offers both to an admin on a comment he did not write', () => {
-        renderComment({ userId: 'admin-1', isAdmin: true });
+        renderComment({ userId: 'admin-1', canModerate: true });
 
         expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument();
         expect(
@@ -84,7 +84,7 @@ describe('Comment permissions', () => {
         renderComment({
             comment: { ...rootComment, replies: [reply] },
             userId: 'admin-1',
-            isAdmin: true,
+            canModerate: true,
         });
 
         expect(screen.getAllByRole('button', { name: 'Edit' })).toHaveLength(2);
