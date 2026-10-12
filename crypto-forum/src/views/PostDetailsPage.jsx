@@ -7,6 +7,7 @@ import { Avatar, Button, Card, Center, Container, Flex, Heading, IconButton, Spa
 import { toaster } from '../components/ui/toast-store.js';
 import { formatDate } from "../utils/formatDate.js";
 import { useAuth } from "../hooks/useAuth.js";
+import { canModerate } from "../utils/roles.js";
 import { Header } from '../components/ui/Header.jsx';
 import { getCommentsByPostId } from "../services/comments.js";
 import { getAvatarUrl } from "../services/profiles.js";
@@ -24,7 +25,7 @@ function PostDetailsPage() {
     const { id } = useParams();
     const [pageLoading, setPageLoading] = useState(true);
     const { user, profile } = useAuth();
-    const isAdmin = profile?.role === 'admin';
+    const isModerator = canModerate(profile);
     const [score, setScore] = useState(0);
     const [userVote, setUserVote] = useState(0);
     const [sort, setSort] = useState('newest');
@@ -211,7 +212,7 @@ function PostDetailsPage() {
 
                     <Spacer />
 
-                    {(post.author_id === user.id || isAdmin) && (
+                    {(post.author_id === user.id || isModerator) && (
                         <HStack gap={2}>
                             <Button
                                 size="sm"
@@ -274,7 +275,7 @@ function PostDetailsPage() {
                             key={comment.id}
                             comment={comment}
                             userId={user.id}
-                            isAdmin={isAdmin}
+                            canModerate={isModerator}
                             isBlocked={profile?.is_blocked}
                             commentVotes={commentVotes}
 

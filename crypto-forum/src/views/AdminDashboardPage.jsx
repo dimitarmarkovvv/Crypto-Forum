@@ -7,8 +7,10 @@ import {
     Button,
     Container,
     Heading,
+    HStack,
     Input,
-    SimpleGrid,
+    Menu,
+    Portal,
     Spinner,
     Stack,
     Table,
@@ -17,14 +19,24 @@ import {
 import {
     adminSearchUsers,
     getAvatarUrl,
+    promoteUser,
     setUserBlocked,
 } from '../services/profiles.js';
-import { getForumStats } from '../services/homepage.js';
+import { useAuth } from '../hooks/useAuth.js';
+import { ROLES } from '../utils/roles.js';
+import { LuChevronDown } from 'react-icons/lu';
 import { toaster } from '../components/ui/toast-store.js';
 import BlockUserDialog from '../components/ui/admin/BlockUserDialog.jsx';
+import RoleChangeDialog from '../components/ui/admin/RoleChangeDialog.jsx';
 import PostManagement from '../components/ui/admin/PostManagement.jsx';
 import { Header } from '../components/ui/Header.jsx';
 
+
+const ROLE_LABELS = {
+    user: 'User',
+    moderator: 'Moderator',
+    admin: 'Admin',
+};
 
 function AdminDashboardPage() {
     const navigate = useNavigate();
@@ -33,30 +45,9 @@ function AdminDashboardPage() {
     const [users, setUsers] = useState([]);
     const [loadingUsers, setloadingUsers] = useState(true);
     const [userToBlock, setUserToBlock] = useState(null);
+    const [roleChange, setRoleChange] = useState(null);
 
-    const [stats, setStats] = useState({
-        totalUsers: 0,
-        totalPosts: 0,
-        totalComments: 0,
-    });
-
-    const [statsVersion, setStatsVersion] = useState(0);
-
-    useEffect(() => {
-        const loadStats = async () => {
-            try {
-                const data = await getForumStats();
-                setStats(data);
-            } catch (error) {
-                toaster.create({
-                    title: error.message,
-                    type: 'error',
-                });
-            }
-        }
-
-        loadStats();
-    }, [statsVersion]);
+    const { user } = useAuth() ?? {};
 
     useEffect(() => {
         const loadUsers = async () => {
@@ -125,6 +116,36 @@ function AdminDashboardPage() {
 
     };
 
+    const handleConfirmRoleChange = async () => {
+        if (!roleChange) {
+            return;
+        }
+
+        try {
+            await promoteUser(roleChange.user.id, roleChange.nextRole);
+
+            setUsers((prevUsers) =>
+                prevUsers.map((prevUser) =>
+                    prevUser.id === roleChange.user.id
+                        ? { ...prevUser, role: roleChange.nextRole }
+                        : prevUser
+                )
+            );
+
+            toaster.create({
+                title: `${roleChange.user.username} is now ${ROLE_LABELS[roleChange.nextRole]}`,
+                type: 'success',
+            });
+
+            setRoleChange(null);
+        } catch (error) {
+            toaster.create({
+                title: error.message,
+                type: 'error',
+            });
+        }
+    };
+
     return (
         <Container maxW="7xl" py={10}>
             <Header />
@@ -140,77 +161,7 @@ function AdminDashboardPage() {
                     </Text>
                 </Box>
 
-                <SimpleGrid
-                    columns={{
-                        base: 1,
-                        md: 3,
-                    }}
-                    gap={4}
-                >
-                    <Box
-                        borderWidth="1px"
-                        borderRadius="lg"
-                        p={5}
-                    >
-                        <Text
-                            fontSize="sm"
-                            color="fg.muted"
-                        >
-                            Total Users
-                        </Text>
-
-                        <Heading mt={1}>
-                            {stats.totalUsers}
-                        </Heading>
-                    </Box>
-
-                    <Box
-                        borderWidth="1px"
-                        borderRadius="lg"
-                        p={5}
-                    >
-                        <Text
-                            fontSize="sm"
-                            color="fg.muted"
-                        >
-                            Total Posts
-                        </Text>
-
-                        <Heading mt={1}>
-                            {stats.totalPosts}
-                        </Heading>
-                    </Box>
-
-                    <Box
-                        borderWidth="1px"
-                        borderRadius="lg"
-                        p={5}
-                    >
-                        <Text
-                            fontSize="sm"
-                            color="fg.muted"
-                        >
-                            Total Comments
-                        </Text>
-
-                        <Heading mt={1}>
-                            {stats.totalComments}
-                        </Heading>
-                    </Box>
-                </SimpleGrid>
-
                 <Box>
-                    <Heading size="lg" mb={1}>
-                        User Management
-                    </Heading>
-
-                    <Text
-                        color="fg.muted"
-                        mb={5}
-                    >
-                        Search and review registered users.
-                    </Text>
-
                     <Input
                         placeholder="Search by username, email or name..."
                         value={searchTerm}
@@ -344,36 +295,76 @@ function AdminDashboardPage() {
                                             </Table.Cell>
 
                                             <Table.Cell>
-                                                {foundUser.role === 'admin' ? (
+                                                {foundUser.id === user?.id ? (
                                                     <Badge
                                                         variant="subtle"
                                                         colorPalette="gray"
                                                     >
-                                                        Protected
+                                                        You
                                                     </Badge>
-                                                ) : foundUser.is_blocked ? (
-                                                    <Button
-                                                        size="sm"
-                                                        colorPalette="green"
-                                                        onClick={() =>
-                                                            handleBlockToggle(
-                                                                foundUser.id,
-                                                                false
-                                                            )
-                                                        }
-                                                    >
-                                                        Unblock
-                                                    </Button>
                                                 ) : (
-                                                    <Button
-                                                        size="sm"
-                                                        colorPalette="red"
-                                                        onClick={() =>
-                                                            setUserToBlock(foundUser)
-                                                        }
-                                                    >
-                                                        Block
-                                                    </Button>
+                                                    <HStack gap={8}>
+                                                        <Menu.Root
+                                                            onSelect={(details) =>
+                                                                setRoleChange({
+                                                                    user: foundUser,
+                                                                    nextRole: details.value,
+                                                                })
+                                                            }
+                                                        >
+                                                            <Menu.Trigger asChild>
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="outline"
+                                                                >
+                                                                    Change role <LuChevronDown />
+                                                                </Button>
+                                                            </Menu.Trigger>
+
+                                                            <Portal>
+                                                                <Menu.Positioner>
+                                                                    <Menu.Content>
+                                                                        {ROLES.map((role) => (
+                                                                            <Menu.Item
+                                                                                key={role}
+                                                                                value={role}
+                                                                                disabled={
+                                                                                    role === foundUser.role
+                                                                                }
+                                                                            >
+                                                                                {ROLE_LABELS[role]}
+                                                                            </Menu.Item>
+                                                                        ))}
+                                                                    </Menu.Content>
+                                                                </Menu.Positioner>
+                                                            </Portal>
+                                                        </Menu.Root>
+
+                                                        {foundUser.role === 'admin' ? null : foundUser.is_blocked ? (
+                                                            <Button
+                                                                size="sm"
+                                                                colorPalette="green"
+                                                                onClick={() =>
+                                                                    handleBlockToggle(
+                                                                        foundUser.id,
+                                                                        false
+                                                                    )
+                                                                }
+                                                            >
+                                                                Unblock
+                                                            </Button>
+                                                        ) : (
+                                                            <Button
+                                                                size="sm"
+                                                                colorPalette="red"
+                                                                onClick={() =>
+                                                                    setUserToBlock(foundUser)
+                                                                }
+                                                            >
+                                                                Block
+                                                            </Button>
+                                                        )}
+                                                    </HStack>
                                                 )}
                                             </Table.Cell>
                                         </Table.Row>
@@ -390,11 +381,13 @@ function AdminDashboardPage() {
                     handleConfirmBlock={handleConfirmBlock}
                 />
 
-                <PostManagement
-                    onPostDeleted={() =>
-                        setStatsVersion((version) => version + 1)
-                    }
+                <RoleChangeDialog
+                    roleChange={roleChange}
+                    setRoleChange={setRoleChange}
+                    handleConfirmRoleChange={handleConfirmRoleChange}
                 />
+
+                <PostManagement />
             </Stack>
         </Container>
     );

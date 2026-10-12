@@ -151,6 +151,22 @@ begin
         raise exception 'Only admins can promote users.';
     end if;
 
+    if new_role not in ('user', 'moderator', 'admin') then
+        raise exception 'Unknown role: %', new_role;
+    end if;
+
+    if target_user_id = auth.uid() then
+        raise exception 'You cannot change your own role.';
+    end if;
+
+    if not exists (
+        select 1
+        from public.profiles
+        where id = target_user_id
+    ) then
+        raise exception 'User not found.';
+    end if;
+
     update public.profiles
     set role = new_role
     where id = target_user_id;

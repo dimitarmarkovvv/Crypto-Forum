@@ -8,7 +8,7 @@ function Comment({
     depth = 0,
     parentComment = null,
     userId,
-    isAdmin = false,
+    canModerate = false,
     isBlocked,
     commentVotes,
 
@@ -33,7 +33,7 @@ function Comment({
     const shouldIndent = depth > 0 && depth <= 3;
     const isDeepReply = depth > 3;
     const isOwner = comment.author_id === userId;
-    const canModerate = isOwner || isAdmin;
+    const showControls = isOwner || canModerate;
 
     const voteData = commentVotes[comment.id] ?? {
         score: 0,
@@ -212,7 +212,7 @@ function Comment({
                                 Reply
                             </Button>
 
-                            {canModerate && (
+                            {showControls && (
                                 <HStack ml="auto">
                                     <Button
                                         type="button"
@@ -292,7 +292,7 @@ function Comment({
                             depth={depth + 1}
                             parentComment={comment}
                             userId={userId}
-                            isAdmin={isAdmin}
+                            canModerate={canModerate}
                             isBlocked={isBlocked}
                             commentVotes={commentVotes}
 
