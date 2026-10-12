@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { AuthContext } from './AuthContext';
 import { supabase } from '../supabase/supabaseClient';
 import { useProfileSubscription } from '../hooks/useProfileSubscription';
+import { PROFILE_COLUMNS } from '../services/profiles';
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -12,7 +13,7 @@ export function AuthProvider({ children }) {
   const fetchProfile = async (userId) => {
     const { data: profileData } = await supabase
       .from('profiles')
-      .select('*')
+      .select(PROFILE_COLUMNS)
       .eq('id', userId)
       .single();
 

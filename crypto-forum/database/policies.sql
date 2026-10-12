@@ -185,18 +185,53 @@ using (true);
 create policy "Users can create their own post votes"
 on public.post_votes
 for insert
-with check (user_id = auth.uid());
+to authenticated
+with check (
+    user_id = auth.uid()
+    and exists (
+        select 1
+        from public.profiles
+        where id = auth.uid()
+        and is_blocked = false
+    )
+);
 
 create policy "Users can update their own post votes"
 on public.post_votes
 for update
-using (user_id = auth.uid())
-with check (user_id = auth.uid());
+to authenticated
+using (
+    user_id = auth.uid()
+    and exists (
+        select 1
+        from public.profiles
+        where id = auth.uid()
+        and is_blocked = false
+    )
+)
+with check (
+    user_id = auth.uid()
+    and exists (
+        select 1
+        from public.profiles
+        where id = auth.uid()
+        and is_blocked = false
+    )
+);
 
 create policy "Users can delete their own post votes"
 on public.post_votes
 for delete
-using (user_id = auth.uid());
+to authenticated
+using (
+    user_id = auth.uid()
+    and exists (
+        select 1
+        from public.profiles
+        where id = auth.uid()
+        and is_blocked = false
+    )
+);
 
 -- Comment votes
 alter table public.comment_votes enable row level security;
@@ -209,18 +244,53 @@ using (true);
 create policy "Users can create their own comment votes"
 on public.comment_votes
 for insert
-with check (user_id = auth.uid());
+to authenticated
+with check (
+    user_id = auth.uid()
+    and exists (
+        select 1
+        from public.profiles
+        where id = auth.uid()
+        and is_blocked = false
+    )
+);
 
 create policy "Users can update their own comment votes"
 on public.comment_votes
 for update
-using (user_id = auth.uid())
-with check (user_id = auth.uid());
+to authenticated
+using (
+    user_id = auth.uid()
+    and exists (
+        select 1
+        from public.profiles
+        where id = auth.uid()
+        and is_blocked = false
+    )
+)
+with check (
+    user_id = auth.uid()
+    and exists (
+        select 1
+        from public.profiles
+        where id = auth.uid()
+        and is_blocked = false
+    )
+);
 
 create policy "Users can delete their own comment votes"
 on public.comment_votes
 for delete
-using (user_id = auth.uid());
+to authenticated
+using (
+    user_id = auth.uid()
+    and exists (
+        select 1
+        from public.profiles
+        where id = auth.uid()
+        and is_blocked = false
+    )
+);
 
 -- Profiles
 alter table public.profiles enable row level security;
@@ -244,6 +314,24 @@ on public.profiles
 for update
 using (id = auth.uid())
 with check (id = auth.uid());
+
+revoke select on public.profiles from authenticated;
+
+grant select(
+    id,
+    username,
+    first_name,
+    last_name,
+    role,
+    is_blocked,
+    created_at,
+    avatar_url,
+    location,
+    signature,
+    gender
+)
+on public.profiles
+to authenticated;
 
 revoke update on public.profiles from authenticated;
 
@@ -269,6 +357,19 @@ to authenticated;
 create policy "Users can upload their own avatar"
 on storage.objects
 for insert
+with check (
+  bucket_id = 'avatars'
+  and (storage.foldername(name))[1] = auth.uid()::text
+);
+
+create policy "Users can replace their own avatar"
+on storage.objects
+for update
+to authenticated
+using (
+  bucket_id = 'avatars'
+  and (storage.foldername(name))[1] = auth.uid()::text
+)
 with check (
   bucket_id = 'avatars'
   and (storage.foldername(name))[1] = auth.uid()::text
