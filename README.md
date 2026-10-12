@@ -1,4 +1,4 @@
-# Crypto Forum
+# LearnCrypto
 
 A discussion forum for cryptocurrency, built as a single-page React
 application on top of Supabase. Users register, write posts, hold
