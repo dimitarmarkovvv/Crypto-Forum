@@ -58,8 +58,8 @@ meme, with hover tooltips on the charts.
 ### Install
 
 ```bash
-git clone https://github.com/dimitarmarkovvv/Crypto-Forum.git
-cd Crypto-Forum/crypto-forum
+git clone https://github.com/dimitarmarkovvv/learnCrypto.git
+cd learnCrypto/crypto-forum
 npm install
 ```
 
