@@ -22,6 +22,7 @@ import {
 import { getForumStats } from '../services/homepage.js';
 import { toaster } from '../components/ui/toast-store.js';
 import BlockUserDialog from '../components/ui/admin/BlockUserDialog.jsx';
+import PostManagement from '../components/ui/admin/PostManagement.jsx';
 import { Header } from '../components/ui/Header.jsx';
 
 
@@ -39,6 +40,8 @@ function AdminDashboardPage() {
         totalComments: 0,
     });
 
+    const [statsVersion, setStatsVersion] = useState(0);
+
     useEffect(() => {
         const loadStats = async () => {
             try {
@@ -53,7 +56,7 @@ function AdminDashboardPage() {
         }
 
         loadStats();
-    }, []);
+    }, [statsVersion]);
 
     useEffect(() => {
         const loadUsers = async () => {
@@ -387,15 +390,11 @@ function AdminDashboardPage() {
                     handleConfirmBlock={handleConfirmBlock}
                 />
 
-                <Box>
-                    <Heading size="lg" mb={1}>
-                        Post Management
-                    </Heading>
-
-                    <Text color="fg.muted">
-                        Post moderation tools will be added here next.
-                    </Text>
-                </Box>
+                <PostManagement
+                    onPostDeleted={() =>
+                        setStatsVersion((version) => version + 1)
+                    }
+                />
             </Stack>
         </Container>
     );

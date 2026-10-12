@@ -15,7 +15,7 @@ export const getPosts = async ({
     .select('*, profiles(username, avatar_url), comments(count)')
 
   if (search.trim()) {
-    query = query.ilike('title', `${search.trim()}%`)
+    query = query.ilike('title', `%${search.trim()}%`)
   }
 
   if (authorID) {
@@ -38,6 +38,54 @@ export const getPosts = async ({
     ...post,
     commentCount: post.comments?.[0]?.count ?? 0,
   }));
+};
+
+const adminSortOptions = {
+  newest: { column: 'created_at', ascending: false },
+  oldest: { column: 'created_at', ascending: true },
+  title_asc: { column: 'title', ascending: true },
+  title_desc: { column: 'title', ascending: false },
+  updated: { column: 'updated_at', ascending: false },
+};
+
+export const getAdminPosts = async ({
+  page = 1,
+  pageSize = 10,
+  search = '',
+  author = '',
+  sort = 'newest',
+} = {}) => {
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+  const { column, ascending } = adminSortOptions[sort] ?? adminSortOptions.newest;
+
+  let query = supabase
+    .from('posts')
+    .select('id, title, author_id, created_at, updated_at, profiles!inner(username, avatar_url), comments(count)', { count: 'exact' });
+
+  if (search.trim()) {
+    query = query.ilike('title', `%${search.trim()}%`);
+  }
+
+  if (author.trim()) {
+    query = query.ilike('profiles.username', `%${author.trim()}%`);
+  }
+
+  const { data, error, count } = await query
+    .order(column, { ascending })
+    .range(from, to);
+
+  if (error) {
+    throw error;
+  }
+
+  return {
+    posts: (data ?? []).map((post) => ({
+      ...post,
+      commentCount: post.comments?.[0]?.count ?? 0,
+    })),
+    total: count ?? 0,
+  };
 };
 
 export const createPost = async ({ title, content }, authorID) => {
