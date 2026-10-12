@@ -87,7 +87,7 @@ export const deletePost = async (postId) => {
 export const getPostById = async (id) => {
   const {data, error} = await supabase
   .from('posts')
-  .select('*, profiles(username)')
+  .select('*, profiles(username, avatar_url)')
   .eq('id', id)
   .single();
 

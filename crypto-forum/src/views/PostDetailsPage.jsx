@@ -3,12 +3,13 @@ import { LuPencil, LuTrash2, LuMessageSquare } from 'react-icons/lu';
 import { useParams } from "react-router-dom";
 import { deletePost, getPostById } from "../services/posts";
 import { useEffect, useState } from "react";
-import { Button, Card, Center, Container, Flex, Heading, IconButton, Spacer, Spinner, HStack, Text, Stack, Textarea, Box, NativeSelect, Link } from '@chakra-ui/react';
+import { Avatar, Button, Card, Center, Container, Flex, Heading, IconButton, Spacer, Spinner, HStack, Text, Stack, Textarea, Box, NativeSelect, Link } from '@chakra-ui/react';
 import { toaster } from '../components/ui/toast-store.js';
 import { formatDate } from "../utils/formatDate.js";
 import { useAuth } from "../hooks/useAuth.js";
 import { Header } from '../components/ui/Header.jsx';
 import { getCommentsByPostId } from "../services/comments.js";
+import { getAvatarUrl } from "../services/profiles.js";
 import { castVote, getPostVotes, removeVote, } from "../services/votes.js";
 import { buildCommentTree } from '../utils/buildCommentTree.js';
 import Comment from '../components/ui/comments/Comment.jsx'
@@ -141,16 +142,42 @@ function PostDetailsPage() {
                 <Card.Body>
                     <Heading mb={3}>{post.title}</Heading>
 
-                    <Text mb={5} color="fg.muted" fontSize="sm">
-                        by{' '}
-                        <Link asChild color="inherit">
+                    <Flex align="center" gap={3} mb={5}>
+                        <Link asChild>
                             <RouterLink to={`/users/${post.author_id}`}>
-                                {post.profiles.username}
+                                <Avatar.Root
+                                    size="sm"
+                                    borderRadius="full"
+                                    overflow="hidden"
+                                    flexShrink={0}
+                                >
+                                    <Avatar.Fallback
+                                        name={post.profiles.username}
+                                    />
+
+                                    {post.profiles.avatar_url && (
+                                        <Avatar.Image
+                                            src={getAvatarUrl(
+                                                post.profiles.avatar_url
+                                            )}
+                                            alt={`${post.profiles.username}'s avatar`}
+                                        />
+                                    )}
+                                </Avatar.Root>
                             </RouterLink>
                         </Link>
-                        {' · '}
-                        {formatDate(post.created_at)}
-                    </Text>
+
+                        <Text color="fg.muted" fontSize="sm">
+                            by{' '}
+                            <Link asChild color="inherit">
+                                <RouterLink to={`/users/${post.author_id}`}>
+                                    {post.profiles.username}
+                                </RouterLink>
+                            </Link>
+                            {' · '}
+                            {formatDate(post.created_at)}
+                        </Text>
+                    </Flex>
 
                     <Text whiteSpace="pre-wrap">{post.content}</Text>
                 </Card.Body>
